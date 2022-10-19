@@ -1,6 +1,7 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import {Button} from 'react-bootstrap'
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
+import Home from './pages/Home'
 
 function App() {
 	function handleClick(e) {
@@ -8,12 +9,12 @@ function App() {
 		console.log('The button was clicked.')
 	}
 	return (
-		<>
-			<Button variant="primary" onClick={handleClick}>
-				react button
-			</Button>
-			<button className="btn btn-primary">normal button</button>
-		</>
+		<Router>
+			<Routes>
+				<Route exact path="/" element={<Home />}></Route>
+				<Route path="*" element={<Navigate replace to="/" />} />
+			</Routes>
+		</Router>
 	)
 }
 
