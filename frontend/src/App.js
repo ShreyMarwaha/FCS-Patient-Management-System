@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import {Button} from 'react-bootstrap'
 
 function App() {
+	function handleClick(e) {
+		e.preventDefault()
+		console.log('The button was clicked.')
+	}
 	return (
-		<div className="App">
-			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo"/>
-				<p>
-					Edit <code>src/App.js</code> and save to reload.
-				</p>
-				<a
-					className="App-link"
-					href="https://reactjs.org"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Learn React
-				</a>
-			</header>
-		</div>
-	);
+		<>
+			<Button variant="primary" onClick={handleClick}>
+				react button
+			</Button>
+			<button className="btn btn-primary">normal button</button>
+		</>
+	)
 }
 
-export default App;
+export default App
