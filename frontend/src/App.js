@@ -1,6 +1,7 @@
 import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom'
 import Login from './general/Login'
 import SignUp from './general/SignUp'
+import Search from './pages/Search'
 
 function App() {
 	return (
@@ -33,6 +34,7 @@ function App() {
 							<Route exact path="/" element={<Login />} />
 							<Route path="/sign-in" element={<Login />} />
 							<Route path="/sign-up" element={<SignUp />} />
+							<Route path="/search" element={<Search />} />
 						</Routes>
 					</div>
 				</div>
