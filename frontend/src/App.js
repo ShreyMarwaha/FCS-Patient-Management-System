@@ -1,5 +1,4 @@
-import './App.css'
-import {BrowserRouter as Router, Routes, Route, Navigate, Link} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom'
 import Login from './general/Login'
 import SignUp from './general/SignUp'
 
