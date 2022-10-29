@@ -1,3 +1,5 @@
+// Connection Setup ////////////////////////////////////////////////
+
 const express = require('express')
 const cors = require('cors')
 const BodyParser = require('body-parser')
@@ -19,7 +21,10 @@ con.connect(function (err) {
 })
 
 const port = process.env.PORT || 5000
-app.listen(port, (err) => (err ? console.log('Filed to Listen on Port', port) : console.log('Listing for Port', port)))
+app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) : console.log('Listening for Port ', port)))
+
+
+// API Definitions /////////////////////////////////////////////////
 
 app.get('/api/users', (req, res) => {
 	con.query('SELECT * FROM users', (err, data) => {
