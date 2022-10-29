@@ -2,7 +2,6 @@ import React from 'react'
 import {Button} from 'react-bootstrap'
 
 function Login() {
-    function on
 	return (
 		<form>
 			<h3>Sign In</h3>
