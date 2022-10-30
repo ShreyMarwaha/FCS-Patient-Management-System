@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './style.css'
+import './general.css'
 
 function Login() {
 	return (
 		<form>
 			<center className='form'>
 			<div>
-				<h3>Login</h3>
+				<h3 style={{color: 'var(--dark-green)'}}>Login</h3>
 				<div style={{paddingTop: 100}}>
 					<input type="email" className="form-control" placeholder="Enter email" />
 				</div>
@@ -17,7 +17,7 @@ function Login() {
 			</div>
 			<div>
 				<Link className="nav-link" to={'/search'}>
-					<button type="submit" className="btn btn-primary" style={{marginBottom: 20, width: 100}}>
+					<button type="submit" className="btn btn-primary" style={{marginBottom: 20, width: 100, backgroundColor: 'var(--dark-green)', border: 0}}>
 						Submit
 					</button>
 				</Link>

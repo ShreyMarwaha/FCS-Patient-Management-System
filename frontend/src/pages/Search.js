@@ -1,17 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
+import './pages.css'
 
 function Search() {
 
-    fetch('https://192.168.2.235/api/users').then((res) => {
+	const [searchData, setSearchData] = useState("")
+
+	fetch('https://192.168.2.235/api/search').then((res) => {
 		res.json().then((data) => {
-            console.log(data)
+			setSearchData(data)
 		})
-    })
+	})
 
 	return (
-        <>
-		Hello
-        </>
+		<>
+			<h3 style={{color: 'var(--dark-green)'}}>Search for Institutes and Professionals</h3>
+			<input type="text" className="inputfield" placeholder="Search"/>
+
+			<div className='search-results'>
+				{searchData}
+			</div>
+		</>
 	)
 }
 

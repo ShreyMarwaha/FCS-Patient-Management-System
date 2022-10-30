@@ -32,3 +32,10 @@ app.get('/api/users', (req, res) => {
 		res.json(data)
 	})
 })
+
+app.get('/api/search', (req, res) => {
+	con.query('SELECT * FROM users', (err, data) => {
+		if (err) throw err
+		res.json(data)
+	})
+})

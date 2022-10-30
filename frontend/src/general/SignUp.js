@@ -1,12 +1,12 @@
 import React from 'react'
-import './style.css'
+import './general.css'
 
 function SignUp() {
 	return (
 		<form>
 			<center className='form'>
 			<div>
-				<h3>Sign Up</h3>
+				<h3 style={{color: 'var(--dark-green)'}}>Sign Up</h3>
 				<div style={{paddingTop: 100}} className="mb-3">
 					<input type="text" className="form-control" placeholder="First name" />
 				</div>
@@ -21,7 +21,7 @@ function SignUp() {
 				</div>
 			</div>
 			<div>
-				<button type="submit" className="btn btn-primary" style={{marginBottom: 20, width: 100}}>
+				<button type="submit" className="btn btn-primary" style={{marginBottom: 20, width: 100, backgroundColor: 'var(--dark-green)', border: 0}}>
 					Sign Up
 				</button>
 				<p>
