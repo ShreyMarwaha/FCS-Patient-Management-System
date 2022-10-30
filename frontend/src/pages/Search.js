@@ -11,8 +11,9 @@ function Search() {
 	const [searchData3, setSearchData3] = useState()
 	const [dataFound3, setDataFound3] = useState(0)
 
-	const fetchSearchData = (value) => {
+	const fetchSearchData = () => {
 		setQueryRun(1)
+		var value = document.getElementById('searchValue').value
 		fetch('https://192.168.2.235/api/searchdocs?name=' + value).then((res) => {
 			res.json().then((data) => {
 				setSearchData1(JSON.stringify(data))
@@ -39,7 +40,7 @@ function Search() {
 
 			<div style={{display: 'flex'}}>
 				<input id="searchValue" type="text" className="inputfield" placeholder="Search"/>
-				<button className='searchBtn' onClick={fetchSearchData("anand")}>Search</button>
+				<button className='searchBtn' onClick={fetchSearchData}>Search</button>
 			</div>
 
 			<div className='search-results'>
