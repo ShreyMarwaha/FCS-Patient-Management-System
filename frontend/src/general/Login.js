@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 function Login() {
 	return (
@@ -21,12 +22,14 @@ function Login() {
 				</div>
 			</div>
 			<div className="d-grid">
-				<button type="submit" className="btn btn-primary">
-					Submit
-				</button>
+				<Link className="nav-link" to={'/search'}>
+					<button type="submit" className="btn btn-primary">
+						Submit
+					</button>
+				</Link>
 			</div>
 			<p className="forgot-password text-right">
-				Forgot <a href="#">password?</a>
+			<a href="#">Forgot password?</a>
 			</p>
 		</form>
 	)
