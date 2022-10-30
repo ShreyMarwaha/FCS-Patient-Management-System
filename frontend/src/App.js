@@ -8,25 +8,23 @@ function App() {
 	return (
 		<Router>
 			<div className="App">
-				<nav className="navbar navbar-expand-lg navbar-light fixed-top">
-					<div className="container">
+				<nav className="navbar navbar-expand-lg navbar-dark fixed-top">
+					<div className="headercontainer">
 						<Link className="navbar-brand" to={'/sign-in'}>
-							61x Patient Management
+							61X Patient Management System
 						</Link>
-						<div className="collapse navbar-collapse" id="navbarTogglerDemo02">
-							<ul className="navbar-nav ml-auto">
-								<li className="nav-item">
-									<Link className="nav-link" to={'/sign-in'}>
-										Login
-									</Link>
-								</li>
-								<li className="nav-item">
-									<Link className="nav-link" to={'/sign-up'}>
-										Sign up
-									</Link>
-								</li>
-							</ul>
-						</div>
+						<ul className="navbar-nav">
+							<li className="nav-item">
+								<Link className="nav-link" to={'/sign-in'}>
+									Login
+								</Link>
+							</li>
+							<li className="nav-item">
+								<Link className="nav-link" to={'/sign-up'}>
+									Sign Up
+								</Link>
+							</li>
+						</ul>
 					</div>
 				</nav>
 				<div className="auth-wrapper">
