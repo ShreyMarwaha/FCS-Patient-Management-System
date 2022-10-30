@@ -27,14 +27,29 @@ app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) 
 // API Definitions /////////////////////////////////////////////////
 
 app.get('/api/users', (req, res) => {
-	con.query('SELECT * FROM users', (err, data) => {
+	con.query(`SELECT * FROM users`, (err, data) => {
 		if (err) throw err
 		res.json(data)
 	})
 })
 
-app.get('/api/search', (req, res) => {
-	con.query('SELECT * FROM users', (err, data) => {
+app.get('/api/searchdocs', (req, res) => {
+	val = req.query.name
+	con.query(`SELECT name FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
+		if (err) throw err
+		res.json(data)
+	})
+})
+app.get('/api/searchhospitals', (req, res) => {
+	val = req.query.name
+	con.query(`SELECT name FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
+		if (err) throw err
+		res.json(data)
+	})
+})
+app.get('/api/searchpharmacy', (req, res) => {
+	val = req.query.name
+	con.query(`SELECT name FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
 		if (err) throw err
 		res.json(data)
 	})
