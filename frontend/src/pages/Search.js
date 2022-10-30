@@ -38,8 +38,8 @@ function Search() {
 			<h3 style={{color: 'var(--dark-green)'}}>Search for Institutes and Professionals</h3>
 
 			<div style={{display: 'flex'}}>
-				<input type="text" className="inputfield" placeholder="Search"/>
-				<button className='searchBtn' onClick={fetchSearchData}>Search</button>
+				<input id="searchValue" type="text" className="inputfield" placeholder="Search"/>
+				<button className='searchBtn' onClick={fetchSearchData("anand")}>Search</button>
 			</div>
 
 			<div className='search-results'>
