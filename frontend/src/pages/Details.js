@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import './pages.css'
 
@@ -29,7 +30,7 @@ function Details() {
             {type==="doc"?
              <>
                 <h3 style={{color: 'var(--dark-green)'}}>Doctor Details</h3>
-                {fetchDocsDetails}
+                <button className='searchBtn' onClick={fetchDocsDetails}>Search</button>
              </>
             :<></>}
 
