@@ -69,7 +69,7 @@ app.get('/api/detailshos', (req, res) => {
 		res.json({data})
 	})
 })
-app.get('/api/detailsdpha', (req, res) => {
+app.get('/api/detailspha', (req, res) => {
 	val = req.query.id
 	con.query(`SELECT name, city, state FROM pharmacy WHERE id=${val}`, (err, data) => {
 		if (err) throw err

@@ -1,66 +1,76 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import './pages.css'
 
-let d = []
+let name = ""
+let city = ""
+let state = ""
+let hospital = ""
 
 function Details() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     let type = searchParams.get("type")
     let id = searchParams.get("id")
+    const [g, setg] = useState(<></>)
 
-    const fetchDocsDetails = () => {
-        fetch('https://192.168.2.235/api/detailsdoc?id=' + id).then((res) => {
-			res.json().then((data) => {
-				if (data.data.length===0) {
-					
-				}
-				else {
-					d = data.data
-				}
-			})
-		})
-    }
-    const fetchHosDetails = () => {
-        fetch('https://192.168.2.235/api/detailshos?id=' + id).then((res) => {
-			res.json().then((data) => {
-				if (data.data.length===0) {
-					
-				}
-				else {
-					d = data.data
-				}
-			})
-		})
-    }
-    const fetchPharmaDetails = () => {
-        fetch('https://192.168.2.235/api/detailspha?id=' + id).then((res) => {
-			res.json().then((data) => {
-				if (data.data.length===0) {
-					
-				}
-				else {
-					d = data.data
-				}
-			})
-		})
+    const fetchDetails = () => {
+        if (type==="doc")
+        {
+            fetch('https://192.168.2.235/api/detailsdoc?id=' + id).then((res) => {
+                res.json().then((data) => {
+                    if (data.data.length===0) {
+                        
+                    }
+                    else {
+                        let f = data.data
+                        name = f[0].name
+                        city = f[0].city
+                        state = f[0].state
+                        hospital = f[0].hospital
+                        setg(<></>)
+                    }
+                })
+            })
+        }
+        else if (type==="hos")
+        {
+            fetch('https://192.168.2.235/api/detailshos?id=' + id).then((res) => {
+                res.json().then((data) => {
+                    if (data.data.length===0) {
+                        
+                    }
+                    else {
+                        let f = data.data
+                        name = f[0].name
+                        city = f[0].city
+                        state = f[0].state
+                        setg(<></>)
+                    }
+                })
+            })
+        }
+        else if (type==="pha")
+        {
+            fetch('https://192.168.2.235/api/detailspha?id=' + id).then((res) => {
+                res.json().then((data) => {
+                    if (data.data.length===0) {
+                        
+                    }
+                    else {
+                        let f = data.data
+                        name = f[0].name
+                        city = f[0].city
+                        state = f[0].state
+                        setg(<></>)
+                    }
+                })
+            })
+        }
     }
 
     useEffect(() => {
-        if (type==="docs")
-        {
-            fetchDocsDetails()
-        }
-        if (type==="hos")
-        {
-            fetchHosDetails()
-        }
-        if (type==="pha")
-        {
-            fetchPharmaDetails()
-        }
-        console.log(d);
+        fetchDetails()
     })
 
     return (
@@ -74,6 +84,17 @@ function Details() {
                     <h3 style={{color: 'var(--dark-green)'}}>Pharmacy Details</h3>
                 }
             </>}
+
+            <div className='data'>
+                Name: {name}
+                <br></br>
+                City: {city}
+                <br></br>
+                State: {state}
+                <br></br>
+                {type==="doc"?<>Hospital: {hospital}</>:<></>}
+                {g}
+            </div>
         </>
     )
 }
