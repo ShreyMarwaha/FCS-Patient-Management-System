@@ -35,21 +35,21 @@ app.get('/api/users', (req, res) => {
 
 app.get('/api/searchdocs', (req, res) => {
 	val = req.query.name
-	con.query(`SELECT name FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
+	con.query(`SELECT name, id FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
 })
 app.get('/api/searchhospitals', (req, res) => {
 	val = req.query.name
-	con.query(`SELECT name FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
+	con.query(`SELECT name, id FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
 })
 app.get('/api/searchpharmacy', (req, res) => {
 	val = req.query.name
-	con.query(`SELECT name FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
+	con.query(`SELECT name, id FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})

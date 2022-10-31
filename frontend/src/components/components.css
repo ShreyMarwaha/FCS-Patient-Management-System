@@ -1,6 +1,14 @@
 .card {
     margin: 10px;
     width: 200px;
+    height: 80%;
     padding: 20px;
     background-color: white;
+}
+.card:hover {
+    box-shadow: 5px 5px 10px grey;
+}
+.cardlink {
+    text-decoration: none;
+    color: black;
 }

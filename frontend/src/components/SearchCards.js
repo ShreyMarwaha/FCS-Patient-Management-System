@@ -1,10 +1,16 @@
+import { Link } from 'react-router-dom'
 import './components.css'
 
-function SearchCards(d) {
+function SearchCards(d, type) {
 
     let l = []
     d.forEach(element => {
-        l.push(<div className='card'>{element.name}</div>)
+        let s = '/details?type=' + type + '&id=' + element.id
+        l.push(<Link className='cardlink' to={s}>
+            <div className='card'>
+                {element.name}
+            </div>
+        </Link>)
     })
 
     return (

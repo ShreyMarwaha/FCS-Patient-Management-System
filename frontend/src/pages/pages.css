@@ -33,7 +33,7 @@
     overflow-y: hidden;
     overflow-x: auto;
     display: flex;
-    justify-content: center;
+    justify-content: left;
     padding: 20px;
     color: gray;
     background-color: lightgray;

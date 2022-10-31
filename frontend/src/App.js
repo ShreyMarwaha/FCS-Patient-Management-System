@@ -4,6 +4,7 @@ import Login from './general/Login'
 import SignUp from './general/SignUp'
 import Home from './general/Home'
 import Search from './pages/Search'
+import Details from './pages/Details'
 import { useState } from 'react'
 import { UserCircle } from 'tabler-icons-react'
 
@@ -62,6 +63,7 @@ function App() {
 								<>
 									<Route exact path="/" element={<Home />} />
 									<Route path="/search" element={<Search />} />
+									<Route path="/details" element={<Details />} />
 								</>
 								:
 								<>

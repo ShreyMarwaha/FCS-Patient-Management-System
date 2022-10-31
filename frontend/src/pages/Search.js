@@ -67,7 +67,7 @@ function Search() {
 						Doctors
 						<div className='records'>
 							{dataFound1?
-								<>{SearchCards(d1)}</>
+								<>{SearchCards(d1, "doc")}</>
 							:
 								<>
 								No Records Found!
@@ -79,7 +79,7 @@ function Search() {
 						Hospitals
 						<div className='records'>
 							{dataFound2?
-								<>{SearchCards(d2)}</>
+								<>{SearchCards(d2, "hos")}</>
 							:
 								<>
 								No Records Found!
@@ -91,7 +91,7 @@ function Search() {
 						Pharmacies
 						<div className='records'>
 							{dataFound3?
-								<>{SearchCards(d3)}</>
+								<>{SearchCards(d3, "pha")}</>
 							:
 								<>
 								No Records Found!
