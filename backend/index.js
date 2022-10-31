@@ -55,9 +55,23 @@ app.get('/api/searchpharmacy', (req, res) => {
 	})
 })
 
-app.get('/api/detailsdocs', (req, res) => {
+app.get('/api/detailsdoc', (req, res) => {
 	val = req.query.id
 	con.query(`SELECT doctors.name, doctors.city, doctors.state, hospitals.name as hospital FROM doctors LEFT JOIN hospitals ON doctors.hospital_id=hospitals.id WHERE doctors.id=${val}`, (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})
+app.get('/api/detailshos', (req, res) => {
+	val = req.query.id
+	con.query(`SELECT name, city, state FROM hospitals WHERE id=${val}`, (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})
+app.get('/api/detailsdpha', (req, res) => {
+	val = req.query.id
+	con.query(`SELECT name, city, state FROM pharmacy WHERE id=${val}`, (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
