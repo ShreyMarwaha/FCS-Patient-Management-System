@@ -54,3 +54,11 @@ app.get('/api/searchpharmacy', (req, res) => {
 		res.json({data})
 	})
 })
+
+app.get('/api/detailsdocs', (req, res) => {
+	val = req.query.id
+	con.query(`SELECT doctors.name, doctors.city, doctors.state, hospitals.name as hospital FROM doctors LEFT JOIN hospitals ON doctors.hospital_id=hospitals.id WHERE doctors.id='%${val}%'`, (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})

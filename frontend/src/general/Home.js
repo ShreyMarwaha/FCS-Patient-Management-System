@@ -4,7 +4,7 @@ import './general.css'
 function Home() {
 	return (
         <>
-		    Hello There!
+            <h3 style={{color: 'var(--dark-green)'}}>Hello There!</h3>
         </>
 	)
 }
