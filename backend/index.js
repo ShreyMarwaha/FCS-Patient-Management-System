@@ -41,16 +41,16 @@ app.post('/api/signup', (req, res) => {
 	})
 })
 
-app.post('/api/signin', (req, res) => {
-	con.query(`SELECT password, salt FROM users WHERE email=${req.body.email}`, (err, data) => {
+app.get('/api/authenticate', (req, res) => {
+	con.query(`SELECT password, salt FROM users WHERE email=abc@gmail.com`, (err, data) => {
 		if (err) throw err
-
-		const salt = data.salt
-		const password = bcrypt.hashSync(req.body.password, salt)
-		if (password === data.password) {
-			res.json({status: 'success'})
-		} else {
-			res.json({status: 'failed', p_in_db: data.password, p_enter_hash: password})
-		}
+		res.json(data)
+		// const salt = data.salt
+		// const password = bcrypt.hashSync(req.body.password, salt)
+		// if (password === data.password) {
+		// 	res.json({status: 'success'})
+		// } else {
+		// 	res.json({status: 'failed', p_in_db: data.password, p_enter_hash: password})
+		// }
 	})
 })
