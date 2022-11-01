@@ -42,15 +42,14 @@ app.post('/api/signup', (req, res) => {
 })
 
 app.get('/api/authenticate', (req, res) => {
-	con.query(`SELECT password, salt FROM users WHERE email="abc@gmail.com"`, (err, data) => {
+	con.query(`SELECT password, salt FROM users WHERE email="${req.body.email}"`, (err, data) => {
 		if (err) throw err
-		res.json(data)
-		// const salt = data.salt
-		// const password = bcrypt.hashSync(req.body.password, salt)
-		// if (password === data.password) {
-		// 	res.json({status: 'success'})
-		// } else {
-		// 	res.json({status: 'failed', p_in_db: data.password, p_enter_hash: password})
-		// }
+		const salt = data.salt
+		const password = bcrypt.hashSync(req.body.password, salt)
+		if (password === data[0].password) {
+			res.json({status: 'success'})
+		} else {
+			res.json({status: 'failed', p_in_db: data.password, p_enter_hash: password})
+		}
 	})
 })
