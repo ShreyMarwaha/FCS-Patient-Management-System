@@ -107,7 +107,6 @@ app.post('/api/signup', (req, res) => {
 		res.status(400)
 	})
 })
-
 app.post('/api/authenticate', (req, res) => {
 	const email = req.body.email
 	const entered_password = req.body.password
