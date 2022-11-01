@@ -57,10 +57,3 @@ app.post('/api/authenticate', (req, res) => {
 		}
 	})
 })
-
-app.get('/api/testing', (req, res) => {
-	con.query(`SELECT password, salt FROM users`, (err, data) => {
-		if (err) throw err
-		res.json(data)
-	})
-})

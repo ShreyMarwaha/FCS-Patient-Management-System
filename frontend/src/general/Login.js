@@ -4,7 +4,6 @@ import {Button} from 'react-bootstrap'
 
 function Login() {
 	function handleSubmit(event) {
-		//password
 		event.preventDefault()
 
 		const data = {}
