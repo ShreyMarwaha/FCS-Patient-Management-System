@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, redirect, Route, useSearchParams } from 'react-router-dom';
 import { Modal } from '@mantine/core';
 import './pages.css'
 
@@ -29,6 +29,7 @@ function Details({role}) {
         {
             fetch('https://192.168.2.235/api/deletepha?id=' + id)
         }
+        setModalOpened(0)
     }
 
     const fetchDetails = () => {
@@ -100,8 +101,10 @@ function Details({role}) {
                 <center>
                     Are you sure you want to delete this Record?
                     The data would be cleared permanently.
-                    <br></br><br></br><br></br>     
-                    <button className='delete-btn-modal' onClick={deleteRecord}>Yes, Proceed</button>
+                    <br></br><br></br><br></br>
+                    <Link to={'/search'}>
+                        <button className='delete-btn-modal' onClick={deleteRecord}>Yes, Proceed</button>
+                    </Link>
                 </center>
             </Modal>
 
