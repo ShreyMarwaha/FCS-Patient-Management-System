@@ -11,7 +11,7 @@ function Login() {
 		data.email = event.target.form_email.value
 		data.password = event.target.form_password.value
 		console.log('Data: ', data)
-		fetch('https://192.168.2.235/api/signin', {
+		fetch('https://192.168.2.235/api/authenticate', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
