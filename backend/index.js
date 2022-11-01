@@ -53,7 +53,7 @@ app.post('/api/authenticate', (req, res) => {
 		if (password === data[0].password) {
 			res.json({status: 'success'})
 		} else {
-			res.json({status: 'failed', data: data})
+			res.json({status: 'failed'})
 		}
 	})
 })
