@@ -14,6 +14,9 @@ function ProfileMenu() {
 		navigate('/')
         setLoggedIn(0)
     }
+    function openProfile() {
+        navigate('/profile')
+    }
 
 	return (
 		<Menu shadow="lg" width={200} trigger="hover" position="bottom-end" offset={15} withArrow>
@@ -26,7 +29,7 @@ function ProfileMenu() {
             </Menu.Target>
 
             <Menu.Dropdown>
-                <Menu.Item><center>Edit Profile</center></Menu.Item>
+                <Menu.Item onClick={openProfile}><center>View Profile</center></Menu.Item>
                 <Menu.Item color="red" onClick={signout}><center>Signout</center></Menu.Item>
             </Menu.Dropdown>
         </Menu>

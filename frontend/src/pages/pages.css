@@ -66,3 +66,15 @@
     border: 0px;
     border-radius: 10px;
 }
+.edit-btn {
+    background-color: var(--dark-green);
+    color: white;
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0px;
+    border-radius: 10px;
+}

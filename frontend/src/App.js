@@ -5,6 +5,7 @@ import SignUp from './general/SignUp'
 import Home from './general/Home'
 import Search from './pages/Search'
 import Details from './pages/Details'
+import Profile from './pages/Profile'
 import ProfileMenu from './components/ProfileMenu'
 import {useState, createContext} from 'react'
 
@@ -72,6 +73,7 @@ function App() {
 										<Route exact path="/" element={<Home />} />
 										<Route path="/search" element={<Search />} />
 										<Route path="/details" element={<Details role={role} />} />
+										<Route path="/profile" element={<Profile />} />
 										<Route path="*" element={<Navigate replace to="/" />} />
 									</>
 								) : (

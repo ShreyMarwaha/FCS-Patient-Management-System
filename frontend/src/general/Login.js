@@ -28,6 +28,8 @@ function Login() {
 				if (data.status === 'success') {
 					setLoggedIn(1)
 					setError(false)
+
+					
 				} else setError(true)
 			})
 			.catch((error) => {
