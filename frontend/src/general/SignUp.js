@@ -1,10 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './general.css'
 import {v4 as uuidv4} from 'uuid'
 import Form from 'react-bootstrap/Form'
 import {Button} from 'react-bootstrap'
+import {DataContext} from '../App'
+import { useNavigate } from 'react-router-dom'
 
 function SignUp() {
+	
+	const {loggedIn, setLoggedIn} = useContext(DataContext)
+	const navigate = useNavigate();
 
 	function handleSubmit(event) {
 		event.preventDefault()
@@ -22,6 +27,7 @@ function SignUp() {
 			},
 			body: JSON.stringify(data),
 		})
+		navigate('/')
 	}
 
 	return (
@@ -56,7 +62,7 @@ function SignUp() {
 						Submit
 					</Button>
 					<p>
-						Already registered? <a href="/sign-in">Login</a>
+						Already registered? <a href="/">Login</a>
 					</p>
 				</div>
 			</center>

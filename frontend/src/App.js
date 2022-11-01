@@ -11,7 +11,7 @@ import {useState, createContext} from 'react'
 export const DataContext = createContext()
 
 function App() {
-	
+
 	const [loggedIn, setLoggedIn] = useState(0)
 	const [role, setRole] = useState('admin')
 	const contextData = {loggedIn, setLoggedIn}
@@ -72,11 +72,12 @@ function App() {
 										<Route exact path="/" element={<Home />} />
 										<Route path="/search" element={<Search />} />
 										<Route path="/details" element={<Details role={role} />} />
+										<Route path="*" element={<Navigate replace to="/" />} />
 									</>
 								) : (
 									<>
 										<Route exact path="/" element={<Login />} />
-										<Route path="/sign-in" element={<Login />} />
+										<Route path="/" element={<Login />} />
 										<Route path="/sign-up" element={<SignUp />} />
 										<Route path="*" element={<Navigate replace to="/" />} />
 									</>
