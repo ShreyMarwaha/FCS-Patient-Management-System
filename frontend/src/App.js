@@ -6,7 +6,7 @@ import Home from './general/Home'
 import Search from './pages/Search'
 import Details from './pages/Details'
 import { useState } from 'react'
-import { UserCircle } from 'tabler-icons-react'
+import ProfileMenu from './components/ProfileMenu'
 
 function App() {
 
@@ -24,11 +24,7 @@ function App() {
 						</Link>
 						<ul className="navbar-nav">
 							{loggedIn? 
-								<li className="nav-item" style={{borderRadius: 100}}>
-									<center>
-										<UserCircle color='white' size={40}/>
-									</center>
-								</li>
+								<ProfileMenu/>
 							:
 							<>
 								<li className="nav-item">

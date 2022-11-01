@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, redirect, Route, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Modal } from '@mantine/core';
 import './pages.css'
 
