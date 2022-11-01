@@ -15,7 +15,6 @@ function Login() {
 		const data = {}
 		data.email = event.target.form_email.value
 		data.password = event.target.form_password.value
-		console.log('Data: ', data)
 
 		fetch('https://192.168.2.235/api/authenticate', {
 			method: 'POST',
@@ -26,7 +25,6 @@ function Login() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('Success:', data)
 				if (data.status === 'success') {
 					setLoggedIn(1)
 					setError(false)

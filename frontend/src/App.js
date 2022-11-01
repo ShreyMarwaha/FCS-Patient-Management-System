@@ -11,9 +11,11 @@ import {useState, createContext} from 'react'
 export const DataContext = createContext()
 
 function App() {
+	
 	const [loggedIn, setLoggedIn] = useState(0)
 	const [role, setRole] = useState('admin')
 	const contextData = {loggedIn, setLoggedIn}
+
 	return (
 		<DataContext.Provider value={contextData}>
 			<Router>
