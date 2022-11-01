@@ -11,6 +11,7 @@ import { UserCircle } from 'tabler-icons-react'
 function App() {
 
 	const [loggedIn, setLoggedIn] = useState(1)
+	const [role, setRole] = useState("admin")
 
 	return (
 		<Router>
@@ -51,6 +52,14 @@ function App() {
 						<Link className='sidebar-btn' to={'/search'}>
 							Search
 						</Link>
+
+						{role==="patient"?
+							<Link className='sidebar-btn' to={'/'}>
+								My Documents
+							</Link>
+						:
+							<></>
+						}
 					</div>
 				:
 					<></>
@@ -63,7 +72,7 @@ function App() {
 								<>
 									<Route exact path="/" element={<Home />} />
 									<Route path="/search" element={<Search />} />
-									<Route path="/details" element={<Details />} />
+									<Route path="/details" element={<Details role={role}/>} />
 								</>
 								:
 								<>

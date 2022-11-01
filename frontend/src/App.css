@@ -40,15 +40,19 @@
   width: 20%;
   padding-top: 100px;
   background-color: var(--light-green);
+  display: flex;
+  flex-direction: column;
 }
 .sidebar-btn {
-  position: absolute;
   left: 0;
   width: 100%;
   text-decoration: none;
   color: var(--dark-green);
+  border-top: 1px solid var(--dark-green);
+  border-bottom: 1px solid var(--dark-green);
+  margin-bottom: 5px;
   font-weight: 500;
-  padding: 10px;
+  padding: 15px;
 }
 .sidebar-btn:hover {
   background-color: var(--dark-green);

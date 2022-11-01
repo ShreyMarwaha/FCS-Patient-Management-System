@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Modal } from '@mantine/core';
 import './pages.css'
 
 let name = ""
@@ -7,12 +8,28 @@ let city = ""
 let state = ""
 let hospital = ""
 
-function Details() {
+function Details({role}) {
 
     const [searchParams, setSearchParams] = useSearchParams();
     let type = searchParams.get("type")
     let id = searchParams.get("id")
     const [g, setg] = useState(<></>)
+    const [modalOpened, setModalOpened] = useState(0)
+
+    const deleteRecord = () => {
+        if (type==="doc")
+        {
+            fetch('https://192.168.2.235/api/deletedoc?id=' + id)
+        }
+        else if (type==="hos")
+        {
+            fetch('https://192.168.2.235/api/deletehos?id=' + id)
+        }
+        else if (type==="pha")
+        {
+            fetch('https://192.168.2.235/api/deletepha?id=' + id)
+        }
+    }
 
     const fetchDetails = () => {
         if (type==="doc")
@@ -75,6 +92,19 @@ function Details() {
 
     return (
         <>
+            <Modal
+                centered
+                opened={modalOpened}
+                onClose={() => setModalOpened(false)}
+            >
+                <center>
+                    Are you sure you want to delete this Record?
+                    The data would be cleared permanently.
+                    <br></br><br></br><br></br>     
+                    <button className='delete-btn-modal' onClick={deleteRecord}>Yes, Proceed</button>
+                </center>
+            </Modal>
+
             {type==="doc"?
                 <h3 style={{color: 'var(--dark-green)'}}>Doctor Details</h3>
             :<>
@@ -95,6 +125,14 @@ function Details() {
                 {type==="doc"?<>Hospital: {hospital}</>:<></>}
                 {g}
             </div>
+
+            {role==="admin"?
+                <button className='delete-btn' onClick={() => setModalOpened(1)}>
+                    Delete {type==="doc"?<>Doctor</>:<>{type==="hos"?<>Hospital</>:<>Pharmacy</>}</>} Record
+                </button>
+            :
+                <></>
+            }
         </>
     )
 }

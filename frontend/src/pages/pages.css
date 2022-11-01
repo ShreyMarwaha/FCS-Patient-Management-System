@@ -44,3 +44,25 @@
     font-weight: 500;
     text-align: left;
 }
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0px;
+    border-radius: 10px;
+}
+.delete-btn-modal {
+    background-color: red;
+    color: white;
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0px;
+    border-radius: 10px;
+}
