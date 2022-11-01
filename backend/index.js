@@ -76,3 +76,25 @@ app.get('/api/detailspha', (req, res) => {
 		res.json({data})
 	})
 })
+
+app.get('/api/deletedoc', (req, res) => {
+	val = req.query.id
+	con.query(`DELETE FROM doctors WHERE id=${val}`, (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})
+app.get('/api/deletehos', (req, res) => {
+	val = req.query.id
+	con.query(`DELETE FROM hospitals WHERE id=${val}`, (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})
+app.get('/api/deletepha', (req, res) => {
+	val = req.query.id
+	con.query(`DELETE FROM pharmacy WHERE id=${val}`, (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})
