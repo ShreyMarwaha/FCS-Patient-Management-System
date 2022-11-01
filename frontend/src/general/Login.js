@@ -17,9 +17,14 @@ function Login() {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(data),
-		}).then((res) => {
-			console.log(res)
 		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Success:', data)
+			})
+			.catch((error) => {
+				console.error('Error:', error)
+			})
 	}
 	return (
 		<Form onSubmit={handleSubmit} className="m-5">

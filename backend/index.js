@@ -48,7 +48,7 @@ app.post('/api/authenticate', (req, res) => {
 		if (err) throw err
 		// const salt = data.salt
 		// const password = bcrypt.hashSync(entered_password, salt)
-		res.json(data[0])
+		res.json(data)
 		// if (password === data[0].password) {
 		// 	res.json({status: 'success'})
 		// } else {
