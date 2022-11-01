@@ -42,7 +42,7 @@ app.post('/api/signup', (req, res) => {
 })
 
 app.get('/api/authenticate', (req, res) => {
-	con.query(`SELECT password, salt FROM users WHERE email=abc@gmail.com`, (err, data) => {
+	con.query(`SELECT password, salt FROM users WHERE email="abc@gmail.com"`, (err, data) => {
 		if (err) throw err
 		res.json(data)
 		// const salt = data.salt
