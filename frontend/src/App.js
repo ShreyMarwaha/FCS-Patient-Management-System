@@ -4,6 +4,7 @@ import Login from './general/Login'
 import SignUp from './general/SignUp'
 import Home from './general/Home'
 import Search from './pages/Search'
+import Meds from './pages/Meds'
 import Details from './pages/Details'
 import Profile from './pages/Profile'
 import ProfileMenu from './components/ProfileMenu'
@@ -12,7 +13,6 @@ import {useState, createContext} from 'react'
 export const DataContext = createContext()
 
 function App() {
-
 	const [loggedIn, setLoggedIn] = useState(0)
 	const [role, setRole] = useState('admin')
 	const contextData = {loggedIn, setLoggedIn}
@@ -27,22 +27,22 @@ function App() {
 								61X Patient Management System
 							</Link>
 							<ul className="navbar-nav">
-								{loggedIn? 
-									<ProfileMenu/>
-								:
-								<>
-									<li className="nav-item">
-										<Link className="nav-link" to={'/sign-in'}>
-											Login
-										</Link>
-									</li>
-									<li className="nav-item">
-										<Link className="nav-link" to={'/sign-up'}>
-											Sign Up
-										</Link>
-									</li>
-								</>
-								}
+								{loggedIn ? (
+									<ProfileMenu />
+								) : (
+									<>
+										<li className="nav-item">
+											<Link className="nav-link" to={'/sign-in'}>
+												Login
+											</Link>
+										</li>
+										<li className="nav-item">
+											<Link className="nav-link" to={'/sign-up'}>
+												Sign Up
+											</Link>
+										</li>
+									</>
+								)}
 							</ul>
 						</div>
 					</nav>
@@ -52,7 +52,9 @@ function App() {
 							<Link className="sidebar-btn" to={'/search'}>
 								Search
 							</Link>
-
+							<Link className="sidebar-btn" to={'/Meds'}>
+								Meds
+							</Link>
 							{role === 'patient' ? (
 								<Link className="sidebar-btn" to={'/'}>
 									My Documents
@@ -72,6 +74,7 @@ function App() {
 									<>
 										<Route exact path="/" element={<Home />} />
 										<Route path="/search" element={<Search />} />
+										<Route path="/Meds" element={<Meds />} />
 										<Route path="/details" element={<Details role={role} />} />
 										<Route path="/profile" element={<Profile />} />
 										<Route path="*" element={<Navigate replace to="/" />} />

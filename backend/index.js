@@ -4,7 +4,11 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcrypt')
 const BodyParser = require('body-parser')
+const shortid = require('shortid')
+const Razorpay = require('razorpay')
+
 require('dotenv').config()
+
 const app = express()
 app.use(cors())
 app.use(BodyParser.json())
@@ -15,6 +19,11 @@ var con = mysql.createConnection({
 	user: 'root',
 	password: 'Password@123',
 	database: 'fcs',
+})
+
+const razorpay = new Razorpay({
+	key_id: 'rzp_test_lzmoFzw17LDqLa',
+	key_secret: '6GBr3MchuCrHvUoOwOT5NMfq',
 })
 
 con.connect(function (err) {
@@ -122,4 +131,33 @@ app.post('/api/authenticate', (req, res) => {
 			res.json({status: 'failed'})
 		}
 	})
+})
+
+app.post('/razorpay', async (req, res) => {
+	const payment_capture = 1
+	const medicine_id = req.body.medicine_id
+	//api to get medicine price
+	const amount = 499
+	const currency = 'INR'
+
+	const options = {
+		amount: amount * 100,
+		currency,
+		receipt: shortid.generate(),
+		payment_capture,
+	}
+
+	try {
+		const response = await razorpay.orders.create(options)
+		res.json({
+			status: 'success',
+			id: response.id,
+			currency: response.currency,
+			amount: response.amount,
+		})
+	} catch (error) {
+		res.json({
+			status: 'failure',
+		})
+	}
 })
