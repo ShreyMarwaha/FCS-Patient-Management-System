@@ -141,7 +141,7 @@ app.post('/api/authenticate', (req, res) => {
 	})
 })
 
-app.post('api/razorpay', async (req, res) => {
+app.post('/api/razorpay', async (req, res) => {
 	const payment_capture = 1
 	const medicine_id = req.body.medicine_id
 	//api to get medicine price
