@@ -6,12 +6,14 @@ const bcrypt = require('bcrypt')
 const BodyParser = require('body-parser')
 const shortid = require('shortid')
 const Razorpay = require('razorpay')
+const multer = require('multer')
 
 require('dotenv').config()
 
 const app = express()
 app.use(cors())
 app.use(BodyParser.json())
+app.use(express.static(__dirname + '/public'))
 
 var mysql = require('mysql')
 var con = mysql.createConnection({
@@ -34,6 +36,27 @@ const port = process.env.PORT || 5000
 app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) : console.log('Listening for Port ', port)))
 
 // API Definitions /////////////////////////////////////////////////
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, 'uploads/')
+	},
+
+	// By default, adding them back
+	filename: function (req, file, cb) {
+		cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+	},
+})
+
+app.post('/upload_document', function (req, res) {
+	upload(req, res, function (err) {
+		if (err instanceof multer.MulterError) {
+			return res.status(500).json(err)
+		} else if (err) {
+			return res.status(500).json(err)
+		}
+		return res.status(200).send(req.file)
+	})
+})
 
 app.get('/api/users', (req, res) => {
 	con.query(`SELECT * FROM users`, (err, data) => {
