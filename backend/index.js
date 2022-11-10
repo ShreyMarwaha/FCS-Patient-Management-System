@@ -113,7 +113,7 @@ app.post('/api/signup', (req, res) => {
 	const password = bcrypt.hashSync(req.body.password, salt)
 	con.query(`SELECT * FROM users WHERE email='${req.body.email}'`, (err, data) => {
 		if (err) throw err
-		if (data.length > 0) {
+		if (data.length === 0) {
 			con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${req.body.uuid}','${req.body.name}', '${req.body.email}', '${req.body.registration_type}', '${password}', '${salt}')`, (err) => {
 				if (err) throw err
 				res.status(200)
