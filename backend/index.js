@@ -133,7 +133,7 @@ app.post('/api/authenticate', (req, res) => {
 	})
 })
 
-app.post('/razorpay', async (req, res) => {
+app.post('api/razorpay', async (req, res) => {
 	const payment_capture = 1
 	const medicine_id = req.body.medicine_id
 	//api to get medicine price
@@ -150,14 +150,12 @@ app.post('/razorpay', async (req, res) => {
 	try {
 		const response = await razorpay.orders.create(options)
 		res.json({
-			status: 'success',
 			id: response.id,
 			currency: response.currency,
 			amount: response.amount,
 		})
 	} catch (error) {
-		res.json({
-			status: 'failure',
-		})
+		console.log(error)
+		res.json({status: 'failed'})
 	}
 })
