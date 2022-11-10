@@ -13,7 +13,6 @@ require('dotenv').config()
 const app = express()
 app.use(cors())
 app.use(BodyParser.json())
-app.use(express.static(__dirname + '/public'))
 
 var mysql = require('mysql')
 var con = mysql.createConnection({
@@ -47,7 +46,9 @@ const storage = multer.diskStorage({
 	},
 })
 
-app.post('/upload_document', function (req, res) {
+var upload = multer({storage: storage}).single('file')
+
+app.post('/api/upload_document', function (req, res) {
 	upload(req, res, function (err) {
 		if (err instanceof multer.MulterError) {
 			return res.status(500).json(err)
