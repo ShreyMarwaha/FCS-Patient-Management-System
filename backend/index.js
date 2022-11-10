@@ -111,9 +111,17 @@ app.get('/api/deletepha', (req, res) => {
 app.post('/api/signup', (req, res) => {
 	const salt = bcrypt.genSaltSync(10)
 	const password = bcrypt.hashSync(req.body.password, salt)
-	con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${req.body.uuid}','${req.body.name}', '${req.body.email}', '${req.body.registration_type}', '${password}', '${salt}')`, (err) => {
+	con.query(`SELECT * FROM users WHERE email='${req.body.email}'`, (err, data) => {
 		if (err) throw err
-		res.status(400)
+		if (data.length > 0) {
+			con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${req.body.uuid}','${req.body.name}', '${req.body.email}', '${req.body.registration_type}', '${password}', '${salt}')`, (err) => {
+				if (err) throw err
+				res.status(200)
+			})
+		} else {
+			res.json({message: 'User already exists'})
+			res.status(200)
+		}
 	})
 })
 app.post('/api/authenticate', (req, res) => {
