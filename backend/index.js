@@ -37,7 +37,7 @@ app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) 
 // API Definitions /////////////////////////////////////////////////
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, 'uploads/')
+		cb(null, '/uploads/')
 	},
 
 	// By default, adding them back

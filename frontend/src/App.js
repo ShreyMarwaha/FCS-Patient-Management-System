@@ -6,6 +6,7 @@ import Home from './general/Home'
 import Search from './pages/Search'
 import Meds from './pages/Meds'
 import Details from './pages/Details'
+import Documents from './pages/Documents'
 import Profile from './pages/Profile'
 import ProfileMenu from './components/ProfileMenu'
 import {useState, createContext} from 'react'
@@ -14,7 +15,7 @@ export const DataContext = createContext()
 
 function App() {
 	const [loggedIn, setLoggedIn] = useState(0)
-	const [role, setRole] = useState('admin')
+	const [role, setRole] = useState('patient')
 	const contextData = {loggedIn, setLoggedIn}
 
 	return (
@@ -56,7 +57,7 @@ function App() {
 								Meds
 							</Link>
 							{role === 'patient' ? (
-								<Link className="sidebar-btn" to={'/'}>
+								<Link className="sidebar-btn" to={'/Documents'}>
 									My Documents
 								</Link>
 							) : (
@@ -75,6 +76,7 @@ function App() {
 										<Route exact path="/" element={<Home />} />
 										<Route path="/search" element={<Search />} />
 										<Route path="/Meds" element={<Meds />} />
+										<Route path="/Documents" element={<Documents />} />
 										<Route path="/details" element={<Details role={role} />} />
 										<Route path="/profile" element={<Profile />} />
 										<Route path="*" element={<Navigate replace to="/" />} />

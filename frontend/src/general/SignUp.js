@@ -1,15 +1,14 @@
-import React, { useContext } from 'react'
+import React, {useContext} from 'react'
 import './general.css'
 import {v4 as uuidv4} from 'uuid'
 import Form from 'react-bootstrap/Form'
 import {Button} from 'react-bootstrap'
 import {DataContext} from '../App'
-import { useNavigate } from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 
 function SignUp() {
-	
 	const {loggedIn, setLoggedIn} = useContext(DataContext)
-	const navigate = useNavigate();
+	const navigate = useNavigate()
 
 	function handleSubmit(event) {
 		event.preventDefault()
@@ -27,7 +26,15 @@ function SignUp() {
 			},
 			body: JSON.stringify(data),
 		})
-		navigate('/')
+			.then((response) => response.json())
+			.then((data) => {
+				if (data.message && data.message === 'User already exists') {
+					alert('Email already registered')
+				} else navigate('/')
+			})
+			.catch((error) => {
+				console.error('Error:', error)
+			})
 	}
 
 	return (

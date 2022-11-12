@@ -5,10 +5,8 @@ import './general.css'
 import {DataContext} from '../App'
 
 function Login() {
-
 	const {loggedIn, setLoggedIn} = useContext(DataContext)
 	const [error, setError] = React.useState(false)
-
 	function handleSubmit(event) {
 		event.preventDefault()
 
@@ -28,8 +26,6 @@ function Login() {
 				if (data.status === 'success') {
 					setLoggedIn(1)
 					setError(false)
-
-					
 				} else setError(true)
 			})
 			.catch((error) => {
@@ -43,11 +39,11 @@ function Login() {
 				<div>
 					<h3 style={{color: 'var(--dark-green)'}}>Login</h3>
 					<Form.Group className="mb-3" controlId="form_email" style={{paddingTop: 100}}>
-						<Form.Control type="email" placeholder="Enter email"/>
+						<Form.Control type="email" placeholder="Enter email" />
 					</Form.Group>
 
 					<Form.Group className="mb-3" controlId="form_password">
-						<Form.Control type="password" placeholder="Password"/>
+						<Form.Control type="password" placeholder="Password" />
 					</Form.Group>
 				</div>
 				<div>
