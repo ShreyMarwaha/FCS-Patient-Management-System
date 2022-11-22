@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "node index.js",
 		"start:dev": "pm2 start index.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"script": "scp -r index.js iiitd@192.168.2.235:/var/www/FCS-Patient-Management-System/backend"
 	},
 	"author": "Prionto",
 	"license": "ISC",
