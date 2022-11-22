@@ -4,9 +4,7 @@ import axios from 'axios'
 function Documents() {
 	const [file, setFile] = useState('') // storing the uploaded file
 	// storing the recived file from backend
-	const [data, getFile] = useState({name: '', path: ''})
 	const [progress, setProgess] = useState(0) // progess bar
-	const el = useRef() // accesing input element
 
 	const handleChange = (e) => {
 		setProgess(0)
@@ -21,13 +19,12 @@ function Documents() {
 		axios
 			.post('https://192.168.2.235/api/upload', formData, {
 				onUploadProgress: (ProgressEvent) => {
-					let progress = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100) + '%'
+					let progress = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
 					setProgess(progress)
 				},
 			})
 			.then((res) => {
 				console.log(res)
-				getFile({name: res.data.name, path: 'https://192.168.2.235/docs' + res.data.path})
 			})
 			.catch((err) => console.log(err))
 	}
@@ -35,16 +32,20 @@ function Documents() {
 	return (
 		<div>
 			<div className="file-upload">
-				<input type="file" ref={el} onChange={handleChange} />
+				<input type="file" onChange={handleChange} />
 				<div className="progessBar" style={{width: progress}}>
-					{progress}
+					{progress < 100 ? progress + '%' : <p className="text-success">Upload Complete!</p>}
 				</div>
-				<button onClick={uploadFile} className="upbutton">
+				<button onClick={uploadFile} className="btn btn-primary">
 					Upload
 				</button>
 				<hr />
-				{/* displaying received image*/}
-				{data.path && <img src={data.path} alt={data.name} />}
+
+				{progress === 100 && (
+					<a href={'https://192.168.2.235/docs/' + file.name} target="_blank">
+						{file.name} (View)
+					</a>
+				)}
 			</div>
 		</div>
 	)
