@@ -7,6 +7,7 @@ const BodyParser = require('body-parser')
 const shortid = require('shortid')
 const Razorpay = require('razorpay')
 const multer = require('multer')
+const jwt = require('jsonwebtoken')
 
 require('dotenv').config()
 
@@ -152,7 +153,7 @@ app.post('/api/signup', (req, res) => {
 app.post('/api/authenticate', (req, res) => {
 	const email = req.body.email
 	const entered_password = req.body.password
-	con.query(`SELECT password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
+	con.query(`SELECT id, role, password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
 		if (err) throw err
 		if (data.length === 0) {
 			res.json({status: 'user not found'})
@@ -160,7 +161,36 @@ app.post('/api/authenticate', (req, res) => {
 		}
 		const password = bcrypt.hashSync(entered_password, salt)
 		if (password === data[0].password) {
-			res.json({authentication: 'success', status: data[0].status})
+			// unverified user, blocked users
+			if (data[0].status !== 1) {
+				res.status(200).json({
+					authentication: 'success',
+					status: data[0].status,
+				})
+				return
+			}
+
+			// verified users
+			let jwt_token
+			try {
+				//Creating jwt token
+				jwt_token = jwt.sign({userId: data[0].password.id, role: data[0].role, email: email}, 'secretkeyappearshere', {expiresIn: '1h'})
+			} catch (err) {
+				console.log(err)
+				const error = new Error('Error! Something went wrong.')
+				return next(error)
+			}
+			// sending jwt token
+			res.status(200).json({
+				authentication: 'success',
+				status: data[0].status,
+				data: {
+					userId: data[0].password.id,
+					role: data[0].role,
+					email: email,
+					token: jwt_token,
+				},
+			})
 		} else {
 			res.json({authentication: 'failed'})
 		}
@@ -170,7 +200,7 @@ app.post('/api/authenticate', (req, res) => {
 app.post('/api/razorpay', async (req, res) => {
 	const payment_capture = 1
 	const medicine_id = req.body.medicine_id
-	//api to get medicine price
+	//add api to get medicine price
 	const amount = 499
 	const currency = 'INR'
 
