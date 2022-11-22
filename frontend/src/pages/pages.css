@@ -1,0 +1,80 @@
+@import "../App.css";
+
+.inputfield {
+    width: 100%;
+    height: 50px;
+    padding-left: 20px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+.searchBtn {
+    width: 150px;
+    height: 50px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background-color: var(--dark-green);
+    color: white;
+    border: 0px;
+}
+
+.search-results {
+    position: absolute;
+    top: 300px;
+    bottom: 50px;
+    width: calc(100vw - 20% - 200px);
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.records {
+    margin-top: 10px;
+    margin-bottom: 30px;
+    height: 200px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    display: flex;
+    justify-content: left;
+    padding: 20px;
+    color: gray;
+    background-color: lightgray;
+}
+
+.data {
+    margin-top: 100px;
+    font-weight: 500;
+    text-align: left;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0px;
+    border-radius: 10px;
+}
+.delete-btn-modal {
+    background-color: red;
+    color: white;
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0px;
+    border-radius: 10px;
+}
+.edit-btn {
+    background-color: var(--dark-green);
+    color: white;
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0px;
+    border-radius: 10px;
+}

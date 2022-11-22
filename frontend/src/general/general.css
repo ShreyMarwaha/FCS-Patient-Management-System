@@ -1,0 +1,11 @@
+@import "../App.css";
+
+.form {
+    height: calc(100vh - 170px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.form-control {
+    width: 400px;
+}
