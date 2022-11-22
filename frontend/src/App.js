@@ -10,6 +10,7 @@ import Documents from './pages/Documents'
 import Profile from './pages/Profile'
 import ProfileMenu from './components/ProfileMenu'
 import {useState, createContext} from 'react'
+import React, { Component } from 'react'
 
 export const DataContext = createContext()
 

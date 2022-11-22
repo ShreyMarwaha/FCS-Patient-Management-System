@@ -1,3 +1,5 @@
+import React, { Component } from 'react'
+
 function loadScript(src) {
 	return new Promise((resolve) => {
 		const script = document.createElement('script')

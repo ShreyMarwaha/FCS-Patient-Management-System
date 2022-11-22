@@ -1,4 +1,5 @@
 import './pages.css'
+import React, { Component } from 'react'
 
 function Profile() {
 

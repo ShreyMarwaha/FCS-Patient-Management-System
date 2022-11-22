@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Modal } from '@mantine/core';
 import './pages.css'
+import React, { Component } from 'react'
 
 let name = ""
 let city = ""

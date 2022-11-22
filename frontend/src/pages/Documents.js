@@ -1,5 +1,6 @@
-import React, {useRef, useState} from 'react'
+import {useRef, useState} from 'react'
 import axios from 'axios'
+import React, { Component } from 'react'
 
 function Documents() {
 	const [file, setFile] = useState('') // storing the uploaded file

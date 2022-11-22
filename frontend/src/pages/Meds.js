@@ -1,4 +1,5 @@
 import RazorpayButton from '../components/RazorpayButton'
+import React, { Component } from 'react'
 
 function Meds() {
 	return (

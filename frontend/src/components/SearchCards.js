@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import './components.css'
+import React, { Component } from 'react'
 
 function SearchCards(d, type) {
 

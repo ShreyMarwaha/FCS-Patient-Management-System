@@ -4,6 +4,7 @@ import './components.css'
 import {DataContext} from '../App'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import React, { Component } from 'react'
 
 function ProfileMenu() {
 

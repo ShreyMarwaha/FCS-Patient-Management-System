@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SearchCards from '../components/SearchCards'
 import './pages.css'
+import React, { Component } from 'react'
 
 let d1 = []
 let d2 = []
