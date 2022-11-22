@@ -23,6 +23,7 @@ var con = mysql.createConnection({
 	password: 'Password@123',
 	database: 'fcs',
 })
+const JWT_SECRET = 'mq0g8!0f^DsHYjlq1G^nX0it&E384isrWOiTY05q&M!#RPSrM!'
 
 const razorpay = new Razorpay({
 	key_id: 'rzp_test_lzmoFzw17LDqLa',
@@ -50,6 +51,15 @@ const storage = multer.diskStorage({
 
 var upload = multer({storage: storage}).single('file')
 
+function verify_jwt_signature(token) {
+	try {
+		const decodedToken = jwt.verify(token, JWT_SECRET)
+		return decodedToken
+	} catch (err) {
+		throw 'Token not verified'
+	}
+}
+
 app.post('/api/upload_document', function (req, res) {
 	upload(req, res, function (err) {
 		if (err instanceof multer.MulterError) {
@@ -69,25 +79,52 @@ app.get('/api/users', (req, res) => {
 })
 
 app.get('/api/searchdocs', (req, res) => {
-	val = req.query.name
-	con.query(`SELECT name, id FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
-		if (err) throw err
-		res.json({data})
-	})
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'patient') {
+		val = req.query.name
+		con.query(`SELECT name, id FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 app.get('/api/searchhospitals', (req, res) => {
-	val = req.query.name
-	con.query(`SELECT name, id FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
-		if (err) throw err
-		res.json({data})
-	})
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'patient') {
+		val = req.query.name
+		con.query(`SELECT name, id FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 app.get('/api/searchpharmacy', (req, res) => {
-	val = req.query.name
-	con.query(`SELECT name, id FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
-		if (err) throw err
-		res.json({data})
-	})
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'patient') {
+		val = req.query.name
+		con.query(`SELECT name, id FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 
 app.get('/api/detailsdoc', (req, res) => {
@@ -113,25 +150,52 @@ app.get('/api/detailspha', (req, res) => {
 })
 
 app.get('/api/deletedoc', (req, res) => {
-	val = req.query.id
-	con.query(`DELETE FROM doctors WHERE id=${val}`, (err, data) => {
-		if (err) throw err
-		res.json({data})
-	})
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor' && decoded_token.id == req.query.id) {
+		val = req.query.id
+		con.query(`DELETE FROM doctors WHERE id=${val}`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 app.get('/api/deletehos', (req, res) => {
-	val = req.query.id
-	con.query(`DELETE FROM hospitals WHERE id=${val}`, (err, data) => {
-		if (err) throw err
-		res.json({data})
-	})
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'hospital' && decoded_token.id == req.query.id) {
+		val = req.query.id
+		con.query(`DELETE FROM hospitals WHERE id=${val}`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 app.get('/api/deletepha', (req, res) => {
-	val = req.query.id
-	con.query(`DELETE FROM pharmacy WHERE id=${val}`, (err, data) => {
-		if (err) throw err
-		res.json({data})
-	})
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'patient' && decoded_token.id == req.query.id) {
+		val = req.query.id
+		con.query(`DELETE FROM pharmacy WHERE id=${val}`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 
 app.post('/api/signup', (req, res) => {
@@ -155,44 +219,44 @@ app.post('/api/authenticate', (req, res) => {
 	const entered_password = req.body.password
 	con.query(`SELECT id, role, password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
 		if (err) throw err
-		if (data.length === 0) {
-			res.json({status: 'user not found'})
-			return
-		}
-		const password = bcrypt.hashSync(entered_password, salt)
-		if (password === data[0].password) {
-			// unverified user, blocked users
-			if (data[0].status !== 1) {
+		if (data.length > 0) {
+			const password = bcrypt.hashSync(entered_password, data[0].salt)
+			if (password === data[0].password) {
+				// unverified user, blocked users
+				if (data[0].status !== 1) {
+					res.status(200).json({
+						authentication: 'success',
+						status: data[0].status,
+					})
+					return
+				}
+
+				// verified users
+				let jwt_token
+				try {
+					//Creating jwt token
+					jwt_token = jwt.sign({userId: data[0].id, role: data[0].role, email: email}, JWT_SECRET, {expiresIn: '1h'})
+				} catch (err) {
+					console.log(err)
+					const error = new Error('Error! Something went wrong.')
+					return next(error)
+				}
+				// sending jwt token
 				res.status(200).json({
 					authentication: 'success',
 					status: data[0].status,
+					data: {
+						userId: data[0].id,
+						role: data[0].role,
+						email: email,
+						token: jwt_token,
+					},
 				})
-				return
+			} else {
+				res.json({authentication: 'failed'})
 			}
-
-			// verified users
-			let jwt_token
-			try {
-				//Creating jwt token
-				jwt_token = jwt.sign({userId: data[0].password.id, role: data[0].role, email: email}, 'secretkeyappearshere', {expiresIn: '1h'})
-			} catch (err) {
-				console.log(err)
-				const error = new Error('Error! Something went wrong.')
-				return next(error)
-			}
-			// sending jwt token
-			res.status(200).json({
-				authentication: 'success',
-				status: data[0].status,
-				data: {
-					userId: data[0].password.id,
-					role: data[0].role,
-					email: email,
-					token: jwt_token,
-				},
-			})
 		} else {
-			res.json({authentication: 'failed'})
+			res.json({status: 'user not found'})
 		}
 	})
 })
@@ -221,5 +285,20 @@ app.post('/api/razorpay', async (req, res) => {
 	} catch (error) {
 		console.log(error)
 		res.json({status: 'failed'})
+	}
+})
+app.get('/api/unverifiedusers', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin') {
+		con.query('SELECT email, role, city, state, phone FROM users WHERE status = 0', (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
 	}
 })
