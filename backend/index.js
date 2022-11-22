@@ -152,16 +152,17 @@ app.post('/api/signup', (req, res) => {
 app.post('/api/authenticate', (req, res) => {
 	const email = req.body.email
 	const entered_password = req.body.password
-	con.query(`SELECT password, salt FROM users WHERE email="${email}"`, (err, data) => {
+	con.query(`SELECT password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
 		if (err) throw err
-		if (data.length === 0) res.json({status: 'user not found'})
-
-		const salt = data[0].salt
+		if (data.length === 0) {
+			res.json({status: 'user not found'})
+			return
+		}
 		const password = bcrypt.hashSync(entered_password, salt)
 		if (password === data[0].password) {
-			res.json({status: 'success'})
+			res.json({authentication: 'success', status: data[0].status})
 		} else {
-			res.json({status: 'failed'})
+			res.json({authentication: 'failed'})
 		}
 	})
 })
