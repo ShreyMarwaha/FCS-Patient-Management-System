@@ -5,7 +5,8 @@ import './general.css'
 import {DataContext} from '../App'
 
 function Login() {
-	const {loggedIn, setLoggedIn} = useContext(DataContext)
+	const {loginData, setLoginData} = useContext(DataContext)
+
 	const [error, setError] = React.useState({isError: false, message: ''})
 	function handleSubmit(event) {
 		event.preventDefault()
@@ -25,7 +26,7 @@ function Login() {
 			.then((data) => {
 				if (data.authentication === 'success') {
 					if (data.status === 1) {
-						setLoggedIn(1)
+						setLoginData({isLoggedIn: true, data: data.data})
 						setError({isError: false, message: ''})
 					} else if (data.status === 0) {
 						console.log('User not verified')

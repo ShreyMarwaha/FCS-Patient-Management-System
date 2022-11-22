@@ -14,9 +14,8 @@ import {useState, createContext} from 'react'
 export const DataContext = createContext()
 
 function App() {
-	const [loggedIn, setLoggedIn] = useState(0)
-	const [role, setRole] = useState('patient')
-	const contextData = {loggedIn, setLoggedIn}
+	const [loginData, setLoginData] = useState({isLoggedIn: false})
+	const contextData = {loginData, setLoginData}
 
 	return (
 		<DataContext.Provider value={contextData}>
@@ -28,7 +27,7 @@ function App() {
 								61X Patient Management System
 							</Link>
 							<ul className="navbar-nav">
-								{loggedIn ? (
+								{loginData.isLoggedIn ? (
 									<ProfileMenu />
 								) : (
 									<>
@@ -48,7 +47,7 @@ function App() {
 						</div>
 					</nav>
 
-					{loggedIn ? (
+					{loginData.isLoggedIn ? (
 						<div className="sidebar">
 							<Link className="sidebar-btn" to={'/search'}>
 								Search
@@ -56,7 +55,7 @@ function App() {
 							<Link className="sidebar-btn" to={'/Meds'}>
 								Meds
 							</Link>
-							{role === 'patient' ? (
+							{loginData.data.role === 'patient' ? (
 								<Link className="sidebar-btn" to={'/Documents'}>
 									My Documents
 								</Link>
@@ -68,16 +67,16 @@ function App() {
 						<></>
 					)}
 
-					<div className={loggedIn ? 'auth-wrapper-loggedin' : 'auth-wrapper-loggedout'}>
+					<div className={loginData.isLoggedIn ? 'auth-wrapper-loggedin' : 'auth-wrapper-loggedout'}>
 						<div className="auth-inner">
 							<Routes>
-								{loggedIn ? (
+								{loginData.isLoggedIn ? (
 									<>
 										<Route exact path="/" element={<Home />} />
 										<Route path="/search" element={<Search />} />
 										<Route path="/Meds" element={<Meds />} />
 										<Route path="/Documents" element={<Documents />} />
-										<Route path="/details" element={<Details role={role} />} />
+										<Route path="/details" element={<Details role={loginData.data.role} />} />
 										<Route path="/profile" element={<Profile />} />
 										<Route path="*" element={<Navigate replace to="/" />} />
 									</>
