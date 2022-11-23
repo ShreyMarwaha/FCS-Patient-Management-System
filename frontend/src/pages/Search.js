@@ -14,7 +14,8 @@ function Search() {
 	const [dataFound2, setDataFound2] = useState(0)
 	const [dataFound3, setDataFound3] = useState(0)
 
-	const fetchSearchData = () => {
+	function fetchSearchData() {
+		console.log('clicked')
 		setQueryRun(1)
 		var value = document.getElementById('searchValue').value
 		fetch(`https://192.168.2.235/api/searchdocs?name=${value}&jwt=${loginData.data.token}`).then((res) => {
@@ -27,7 +28,7 @@ function Search() {
 				}
 			})
 		})
-		fetch('https://192.168.2.235/api/searchhospitals?name=' + value).then((res) => {
+		fetch(`https://192.168.2.235/api/searchhospitals?name=${value}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length === 0) {
 				} else {
@@ -36,7 +37,7 @@ function Search() {
 				}
 			})
 		})
-		fetch('https://192.168.2.235/api/searchpharmacy?name=' + value).then((res) => {
+		fetch(`https://192.168.2.235/api/searchpharmacy?name=${value}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length === 0) {
 				} else {
