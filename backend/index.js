@@ -287,6 +287,39 @@ app.post('/api/razorpay', async (req, res) => {
 		res.json({status: 'failed'})
 	}
 })
+
+app.get('/api/normalusers', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin') {
+		con.query(`SELECT email, role, city, state, phone FROM users WHERE status = 1 AND role != "admin"`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/blockedusers', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin') {
+		con.query(`SELECT email, role, city, state, phone FROM users WHERE status = 2`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
 app.get('/api/unverifiedusers', (req, res) => {
 	let decoded_token
 	try {
