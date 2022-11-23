@@ -134,6 +134,13 @@ app.get('/api/deletepha', (req, res) => {
 	})
 })
 
+app.get('/api/unverifiedusers', (req,res) => {
+	con.query('SELECT email, role, city, state, phone FROM users WHERE status = 0', (err, data) => {
+		if (err) throw err
+		res.json({data})
+	})
+})
+
 app.post('/api/signup', (req, res) => {
 	const salt = bcrypt.genSaltSync(10)
 	const password = bcrypt.hashSync(req.body.password, salt)

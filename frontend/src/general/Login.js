@@ -10,7 +10,6 @@ function Login() {
 	const [error, setError] = React.useState({isError: false, message: ''})
 	function handleSubmit(event) {
 		event.preventDefault()
-
 		const data = {}
 		data.email = event.target.form_email.value
 		data.password = event.target.form_password.value
@@ -79,5 +78,4 @@ function Login() {
 		</Form>
 	)
 }
-
 export default Login
