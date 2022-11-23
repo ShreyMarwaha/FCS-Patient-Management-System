@@ -19,7 +19,6 @@ function Search() {
 		fetch('https://192.168.2.235/api/searchdocs?name=' + value).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length===0) {
-					
 				}
 				else {
 					d1 = data.data
