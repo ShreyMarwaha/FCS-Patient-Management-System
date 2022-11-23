@@ -10,11 +10,12 @@ import Documents from './pages/Documents'
 import Profile from './pages/Profile'
 import ProfileMenu from './components/ProfileMenu'
 import {useState, createContext} from 'react'
+import Admin from './pages/Admin'
 
 export const DataContext = createContext()
 
 function App() {
-	const [loginData, setLoginData] = useState({isLoggedIn: false})
+	const [loginData, setLoginData] = useState({isLoggedIn: false, data:{}})
 	const contextData = {loginData, setLoginData}
 
 	return (
@@ -48,7 +49,16 @@ function App() {
 					</nav>
 
 					{loginData.isLoggedIn ? (
-						<div className="sidebar">
+						loginData.data.role === "admin" ?
+						(
+							<div className="sidebar">
+							<Link className="sidebar-btn" to={'/Admin'}>
+								View Unverified Users
+							</Link>
+							</div>
+						) 
+						: 
+						(<div className="sidebar">
 							<Link className="sidebar-btn" to={'/search'}>
 								Search
 							</Link>
@@ -62,8 +72,9 @@ function App() {
 							) : (
 								<></>
 							)}
-						</div>
-					) : (
+						</div>)
+					) : 
+					(
 						<></>
 					)}
 
@@ -76,6 +87,7 @@ function App() {
 										<Route path="/search" element={<Search />} />
 										<Route path="/Meds" element={<Meds />} />
 										<Route path="/Documents" element={<Documents />} />
+										<Route path="/Admin" element={<Admin />} />
 										<Route path="/details" element={<Details role={loginData.data.role} />} />
 										<Route path="/profile" element={<Profile />} />
 										<Route path="*" element={<Navigate replace to="/" />} />
