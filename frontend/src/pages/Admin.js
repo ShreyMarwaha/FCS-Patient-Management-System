@@ -4,52 +4,90 @@ import { Link } from 'react-router-dom'
 import '../components/components.css'
 import React, { Component } from 'react'
 import {DataContext} from '../App'
-import SearchCards from '../components/SearchCards'
 
 let listItems = []
 let output = []
 
-function cards(d){
-	let l = []
-	d.forEach(element => {
-        l.push(<Link className='cardlink' to={element}>
-            <div className='card'>
-                {element.name}
-            </div>
-        </Link>)
-    })
-
-    return (
-        <>
-            {l}
-        </>
-    )
-}
 function Admin() {
 
 	const {loginData, setLoginData} = useContext(DataContext)
-	const [unverifiedUsers, setUnverifiedUsers] = useState(0)
-	useEffect(() =>{
+
+	function verifiedUsers() {
+		fetch(`https://192.168.2.235/api/normalusers?jwt=${loginData.data.token}`).then((res) => {
+			res.json().then((data) => {
+				if (data.data.length===0) {
+                    console.log("No verified users present !!")
+				}
+				else {
+					// listItems = data.data.map((d)=> <li key={d.email}>{d.email}</li>)
+					output = JSON.stringify(data.data)
+					document.getElementById("verified").innerHTML = output;
+				}
+			})
+		})
+	}
+
+	function unverifiedUsers() {
 		fetch(`https://192.168.2.235/api/unverifiedusers?jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length===0) {
                     console.log("No unverified users present !!")
 				}
 				else {
-					setUnverifiedUsers(1)
-					listItems = data.data.map((d)=> <li key={d.email}>{d.email}</li>)
+					// listItems = data.data.map((d)=> <li key={d.email}>{d.email}</li>)
 					output = JSON.stringify(data.data)
-					document.getElementById("result").innerHTML = output;
+					document.getElementById("unverified").innerHTML = output;
 				}
 			})
 		})
-	}, [])
+	}
+
+	function blockedUsers() {
+		fetch(`https://192.168.2.235/api/blockedusers?jwt=${loginData.data.token}`).then((res) => {
+			res.json().then((data) => {
+				if (data.data.length===0) {
+                    console.log("No blocked users present !!")
+				}
+				else {
+					// listItems = data.data.map((d)=> <li key={d.email}>{d.email}</li>)
+					output = JSON.stringify(data.data)
+					document.getElementById("blocked").innerHTML = output;
+				}
+			})
+		})
+	}
 
 	return (
 		<> 
-			<h3 style={{color: 'var(--dark-green)'}}>View all the Unverified Users Here</h3>
-			<br></br><br></br><br></br>
-			<div id = "result">	</div>
+			<h1 style={{color: 'var(--dark-green)'}}>View all the Verified Users Here</h1>
+			<div style={{display: 'flex'}}>
+				<button className="searchBtn" onClick={verifiedUsers}>
+					Click Here
+				</button>
+			</div>
+			<br></br>
+			<div id = "verified">	</div>
+			<br></br><br></br>
+
+			<h1 style={{color: 'var(--dark-green)'}}>View all the Unverified Users Here</h1>
+			<div style={{display: 'flex'}}>
+				<button className="searchBtn" onClick={unverifiedUsers}>
+				Click Here
+				</button>
+			</div>
+			<br></br>
+			<div id = "unverified">	</div>
+			<br></br><br></br>
+
+			<h1 style={{color: 'var(--dark-green)'}}>View all the Blocked Users Here</h1>
+			<div style={{display: 'flex'}}>
+				<button className="searchBtn" onClick={blockedUsers}>
+				Click Here
+				</button>
+			</div>
+			<br></br>
+			<div id = "blocked">	</div>
+			<br></br><br></br>
 		</>
 	)
 }

@@ -11,6 +11,8 @@ import Profile from './pages/Profile'
 import ProfileMenu from './components/ProfileMenu'
 import {useState, createContext} from 'react'
 import Admin from './pages/Admin'
+import Patient from './pages/Patient'
+import Prescription from './pages/Prescription'
 
 export const DataContext = createContext()
 
@@ -53,26 +55,43 @@ function App() {
 						(
 							<div className="sidebar">
 							<Link className="sidebar-btn" to={'/Admin'}>
-								View Unverified Users
+								View Users
 							</Link>
 							</div>
 						) 
 						: 
-						(<div className="sidebar">
-							<Link className="sidebar-btn" to={'/search'}>
-								Search
-							</Link>
-							<Link className="sidebar-btn" to={'/Meds'}>
-								Buy Medicines
-							</Link>
-							{loginData.data.role === 'patient' ? (
-								<Link className="sidebar-btn" to={'/Documents'}>
-									My Documents
-								</Link>
-							) : (
-								<></>
-							)}
-						</div>)
+						(
+							loginData.data.role === 'doctor' ? 
+							(
+								<div className="sidebar">
+									<Link className="sidebar-btn" to={'/Patient'}>
+										View Patients
+									</Link>
+									
+									<Link className="sidebar-btn" to={'/Prescription'}>
+										Make Prescription
+									</Link>
+								</div>
+							)
+							:
+							(
+								<div className="sidebar">
+									<Link className="sidebar-btn" to={'/search'}>
+										Search
+									</Link>
+									<Link className="sidebar-btn" to={'/Meds'}>
+										Buy Medicines
+									</Link>
+									{loginData.data.role === 'patient' ? (
+										<Link className="sidebar-btn" to={'/Documents'}>
+											My Documents
+										</Link>
+									) : (
+										<></>
+									)}
+								</div>
+							)
+						)
 					) : 
 					(
 						<></>
@@ -91,6 +110,8 @@ function App() {
 										<Route path="/details" element={<Details role={loginData.data.role} />} />
 										<Route path="/profile" element={<Profile />} />
 										<Route path="*" element={<Navigate replace to="/" />} />
+										<Route path="/Patient" element={<Patient />} />
+										<Route path="/Prescription" element={<Prescription />} />
 									</>
 								) : (
 									<>

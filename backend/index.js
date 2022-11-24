@@ -336,6 +336,22 @@ app.get('/api/unverifiedusers', (req, res) => {
 	}
 })
 
+app.get('/api/viewpatients', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor') {
+		con.query('SELECT email, name, city, state, phone FROM users WHERE status = 1 AND role = "patient"', (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
 app.get('/api/searchmedicine', (req, res) => {
 	let decoded_token
 	try {
