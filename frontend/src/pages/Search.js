@@ -14,21 +14,21 @@ function Search() {
 		var value = document.getElementById('searchValue').value
 		fetch(`https://192.168.2.235/api/searchdocs?name=${value}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
-				if (!data.hasOwnProperty('err') && data.data.length > 0) {
+				if (!data.hasOwnProperty('err') && data.hasOwnProperty('data')) {
 					setDataDoctor(data.data)
 				}
 			})
 		})
 		fetch(`https://192.168.2.235/api/searchhospitals?name=${value}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
-				if (!data.hasOwnProperty('err') && data.data.length > 0) {
+				if (!data.hasOwnProperty('err') && data.hasOwnProperty('data')) {
 					setDataHospital(data.data)
 				}
 			})
 		})
 		fetch(`https://192.168.2.235/api/searchpharmacy?name=${value}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
-				if (!data.hasOwnProperty('err') && data.data.length > 0) {
+				if (!data.hasOwnProperty('err') && data.hasOwnProperty('data')) {
 					setDataPharmacy(data.data)
 				}
 			})
