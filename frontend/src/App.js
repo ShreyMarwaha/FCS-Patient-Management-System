@@ -63,7 +63,7 @@ function App() {
 								Search
 							</Link>
 							<Link className="sidebar-btn" to={'/Meds'}>
-								Meds
+								Buy Medicines
 							</Link>
 							{loginData.data.role === 'patient' ? (
 								<Link className="sidebar-btn" to={'/Documents'}>
