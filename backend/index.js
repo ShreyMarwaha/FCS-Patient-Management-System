@@ -59,6 +59,14 @@ function verify_jwt_signature(token) {
 		throw 'Token not verified'
 	}
 }
+app.get('/api/test', (req, res) => {
+	console.log('test api')
+	con.query(`SELECT * FROM users`, (err, data) => {
+		if (err) throw err
+		if (data.length > 0) res.send('working')
+		else res.send('you should not be here')
+	})
+})
 
 app.post('/api/upload_document', function (req, res) {
 	upload(req, res, function (err) {
@@ -68,15 +76,6 @@ app.post('/api/upload_document', function (req, res) {
 			return res.status(500).json(err)
 		}
 		return res.status(200).send(req.file)
-	})
-})
-
-app.get('/api/test', (req, res) => {
-	console.log('test api')
-	con.query(`SELECT * FROM users`, (err, data) => {
-		if (err) throw err
-		if (data.length > 0) res.send('working')
-		else res.send('you should not be here')
 	})
 })
 
@@ -150,7 +149,6 @@ app.get('/api/detailspha', (req, res) => {
 		res.json({data})
 	})
 })
-
 app.get('/api/detailsUser', (req, res) => {
 	let decoded_token
 	try {
@@ -322,7 +320,6 @@ app.get('/api/normalusers', (req, res) => {
 		})
 	}
 })
-
 app.get('/api/blockedusers', (req, res) => {
 	let decoded_token
 	try {
@@ -338,7 +335,6 @@ app.get('/api/blockedusers', (req, res) => {
 		})
 	}
 })
-
 app.get('/api/unverifiedusers', (req, res) => {
 	let decoded_token
 	try {
@@ -349,6 +345,22 @@ app.get('/api/unverifiedusers', (req, res) => {
 	}
 	if (decoded_token.role == 'admin') {
 		con.query('SELECT id, email, role, city, state, phone FROM users WHERE status = 0', (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/viewpatients', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor') {
+		con.query('SELECT email, name, city, state, phone FROM users WHERE status = 1 AND role = "patient"', (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -371,7 +383,6 @@ app.get('/api/searchmedicine', (req, res) => {
 		})
 	}
 })
-
 app.get('/api/searchmedicinebyid', (req, res) => {
 	let decoded_token
 	try {
@@ -383,22 +394,6 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 	if (decoded_token.role == 'admin' || decoded_token.role == 'patient' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital' || decoded_token.role == 'pharmacy') {
 		const value = req.query.id
 		con.query(`SELECT DISTINCT medicines.id, medicines.name AS 'Medicine', medicines.price AS 'Price' FROM medicines WHERE medicines.id = ${value}`, (err, data) => {
-			if (err) throw err
-			res.json({data})
-		})
-	}
-})
-
-app.get('/api/viewpatients', (req, res) => {
-	let decoded_token
-	try {
-		decoded_token = verify_jwt_signature(req.query.jwt)
-	} catch (err) {
-		res.json({err})
-		return
-	}
-	if (decoded_token.role == 'doctor') {
-		con.query('SELECT email, name, city, state, phone FROM users WHERE status = 1 AND role = "patient"', (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})

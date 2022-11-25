@@ -4,7 +4,6 @@ import {Link} from 'react-router-dom'
 import '../components/components.css'
 import React, {Component} from 'react'
 import {DataContext} from '../App'
-import SearchCards from '../components/SearchCards'
 
 function Admin() {
 	const {loginData, setLoginData} = useContext(DataContext)
