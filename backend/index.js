@@ -30,8 +30,8 @@ const razorpay = new Razorpay({
 	key_secret: '6GBr3MchuCrHvUoOwOT5NMfq',
 })
 
-con.connect(function (err) {
-	if (err) throw err
+con.on('error', function (err) {
+	console.log('[mysql error]', err)
 })
 
 const port = process.env.PORT || 5000
@@ -71,10 +71,12 @@ app.post('/api/upload_document', function (req, res) {
 	})
 })
 
-app.get('/api/users', (req, res) => {
+app.get('/api/test', (req, res) => {
+	console.log('test api')
 	con.query(`SELECT * FROM users`, (err, data) => {
 		if (err) throw err
-		res.json({data})
+		if (data.length > 0) res.send('working')
+		else res.send('you should not be here')
 	})
 })
 
@@ -147,6 +149,23 @@ app.get('/api/detailspha', (req, res) => {
 		if (err) throw err
 		res.json({data})
 	})
+})
+
+app.get('/api/detailsUser', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin') {
+		val = req.query.id
+		con.query(`SELECT id, email, role, city, state, phone FROM users WHERE id=${val}`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
 
 app.get('/api/deletedoc', (req, res) => {
@@ -329,7 +348,7 @@ app.get('/api/unverifiedusers', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin') {
-		con.query('SELECT email, role, city, state, phone FROM users WHERE status = 0', (err, data) => {
+		con.query('SELECT id, email, role, city, state, phone FROM users WHERE status = 0', (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -368,4 +387,37 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 			res.json({data})
 		})
 	}
+})
+
+app.get('/api/viewpatients', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor') {
+		con.query('SELECT email, name, city, state, phone FROM users WHERE status = 1 AND role = "patient"', (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/approveuser', (req, res) => {
+	const id = req.query.id
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin') {
+		con.query(`UPDATE users SET status=1 WHERE id='${id}'`, (err, data) => {
+			if (err) throw err
+			res.send('User Approved with id ' + id)
+		})
+	} else res.send('Not authorized to approve user.')
 })
