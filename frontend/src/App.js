@@ -15,7 +15,7 @@ import Admin from './pages/Admin'
 export const DataContext = createContext()
 
 function App() {
-	const [loginData, setLoginData] = useState({isLoggedIn: false, data:{}})
+	const [loginData, setLoginData] = useState({isLoggedIn: false, data: {}})
 	const contextData = {loginData, setLoginData}
 
 	return (
@@ -49,32 +49,30 @@ function App() {
 					</nav>
 
 					{loginData.isLoggedIn ? (
-						loginData.data.role === "admin" ?
-						(
+						loginData.data.role === 'admin' ? (
 							<div className="sidebar">
-							<Link className="sidebar-btn" to={'/Admin'}>
-								View Unverified Users
-							</Link>
-							</div>
-						) 
-						: 
-						(<div className="sidebar">
-							<Link className="sidebar-btn" to={'/search'}>
-								Search
-							</Link>
-							<Link className="sidebar-btn" to={'/Meds'}>
-								Meds
-							</Link>
-							{loginData.data.role === 'patient' ? (
-								<Link className="sidebar-btn" to={'/Documents'}>
-									My Documents
+								<Link className="sidebar-btn" to={'/Admin'}>
+									User Management
 								</Link>
-							) : (
-								<></>
-							)}
-						</div>)
-					) : 
-					(
+							</div>
+						) : (
+							<div className="sidebar">
+								<Link className="sidebar-btn" to={'/search'}>
+									Search
+								</Link>
+								<Link className="sidebar-btn" to={'/Meds'}>
+									Meds
+								</Link>
+								{loginData.data.role === 'patient' ? (
+									<Link className="sidebar-btn" to={'/Documents'}>
+										My Documents
+									</Link>
+								) : (
+									<></>
+								)}
+							</div>
+						)
+					) : (
 						<></>
 					)}
 

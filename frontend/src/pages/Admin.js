@@ -9,8 +9,10 @@ import SearchCards from '../components/SearchCards'
 function Admin() {
 	const {loginData, setLoginData} = useContext(DataContext)
 	const [unverifiedUsers, setUnverifiedUsers] = useState([])
+	const [blockedUsers, setBlockedUsers] = useState([])
 	useEffect(() => {
 		getUnverifiedUsers()
+		getBlockedUsers()
 	}, [])
 
 	function getUnverifiedUsers() {
@@ -36,6 +38,17 @@ function Admin() {
 			})
 		})
 	}
+
+	function getBlockedUsers() {
+		fetch(`https://192.168.2.235/api/blockedusers?jwt=${loginData.data.token}`).then((res) => {
+			res.json().then((data) => {
+				if (!data.hasOwnProperty('err') && data.hasOwnProperty('data')) {
+					setBlockedUsers(data.data)
+				}
+			})
+		})
+	}
+
 	function approveUser(e) {
 		e.preventDefault()
 		let userID = e.target.id
@@ -47,10 +60,11 @@ function Admin() {
 	}
 	return (
 		<>
-			<h3 style={{color: 'var(--dark-green)'}}>View all the Unverified Users Here</h3>
+			<h3 style={{color: 'var(--dark-green)'}}>User Management</h3>
 			<br></br>
 			<br></br>
 			<br></br>
+			<h1>Unverified Users</h1>
 			<div className={`${unverifiedUsers.length > 0 ? 'col-6 p-0 ml-5' : ''} `}>
 				{unverifiedUsers.length > 0 ? (
 					<table className="table table-borderless ml-3" style={{minWidth: '130%'}}>
@@ -96,6 +110,59 @@ function Admin() {
 					<center>
 						<div className="bg-danger rounded p-2 d-flex justify-content-center align-items-center">
 							<h5>No slots added/All added slots have been booked</h5>
+						</div>
+					</center>
+				)}
+			</div>
+
+			<hr className="my-5" />
+
+			<h1>Blocked Users</h1>
+			<div className={`${blockedUsers.length > 0 ? 'col-6 p-0 ml-5' : ''} `}>
+				{blockedUsers.length > 0 ? (
+					<table className="table table-borderless ml-3" style={{minWidth: '130%'}}>
+						<thead>
+							<tr className="text-center">
+								<th className="text-secondary" scope="col">
+									Email
+								</th>
+								<th className="text-secondary pl-0" scope="col">
+									Role
+								</th>
+								<th className="text-secondary" scope="col">
+									City
+								</th>
+								<th className="text-secondary" scope="col">
+									State
+								</th>
+								<th className="text-secondary" scope="col">
+									Phone
+								</th>
+								<th className="text-secondary" scope="col">
+									Approve
+								</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							{blockedUsers.map((user) => (
+								<tr className="text-center my-2 py-2" key={user.id}>
+									<td className="pl-0">{user.email}</td>
+									<td className="pl-0">{user.role}</td>
+									<td className="pl-0">{user.city}</td>
+									<td className="pl-0">{user.state}</td>
+									<td className="pl-0">{user.phone}</td>
+									<button className="btn btn-primary" onClick={approveUser} id={user.id}>
+										Approve
+									</button>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				) : (
+					<center>
+						<div className="bg-danger rounded p-2 d-flex justify-content-center align-items-center">
+							<h5>No Blocked Users Found</h5>
 						</div>
 					</center>
 				)}
