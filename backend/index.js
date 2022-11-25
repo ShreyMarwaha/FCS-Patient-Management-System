@@ -181,6 +181,7 @@ app.get('/api/deletehos', (req, res) => {
 		})
 	}
 })
+
 app.get('/api/deletepha', (req, res) => {
 	let decoded_token
 	try {
@@ -214,6 +215,7 @@ app.post('/api/signup', (req, res) => {
 		}
 	})
 })
+
 app.post('/api/authenticate', (req, res) => {
 	const email = req.body.email
 	const entered_password = req.body.password
@@ -384,4 +386,36 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 			res.json({data})
 		})
 	}
+})
+
+app.get('/api/searchpatientbyemail', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital') {
+		const value = req.query.name
+		con.query(`SELECT  name, email FROM users WHERE email = "%${value}%" AND status = 1 AND role = "patient"`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.post('/api/makeprescription', (req, res) => {
+	const prescriptionId = req.body.id
+	const doctorId = req.body.doctorId
+	const date = req.body.date
+	const email = req.body.email
+	const name = req.body.name
+	const prescription = req.body.prescription
+
+	con.query(`INSERT INTO prescriptions (id, doctor_id, date, patient_email, patient_name, prescription) VALUES ('${prescriptionId}','${doctorId}', ${date}, '${email}', '${password}', '${name}', '${prescription}')`, (err) => {
+		if (err) throw err
+		res.status(200)
+		res.json({message: 'Prescription made Successfully!'})
+	})
 })
