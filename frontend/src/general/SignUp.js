@@ -20,11 +20,10 @@ function SignUp() {
 		data.registration_type = event.target.form_registration_type.value
 		data.password = event.target.form_password.value
 
-		if (!ValidateEmail(event.target.form_email.value) || !ValidateName(event.target.form_name.value)) {
+		if (!ValidateEmail(event.target.form_email.value) || !ValidateName(event.target.form_name.value) || CheckPasswordStrength(data.password) !== 'strong') {
 			return
 		}
 		data.uuid = uuidv4()
-
 		fetch('https://192.168.2.235/api/signup', {
 			method: 'POST',
 			headers: {
@@ -65,11 +64,18 @@ function SignUp() {
 	function CheckPasswordStrength(password) {
 		const strongPassword = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})')
 		const mediumPassword = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))')
+		const passwordStrength = document.getElementById('password-strength')
 		if (strongPassword.test(password)) {
+			passwordStrength.textContent = 'Password strength: Strong'
+			passwordStrength.style.color = 'green'
 			return 'strong'
 		} else if (mediumPassword.test(password)) {
+			passwordStrength.textContent = 'Password strength: Medium'
+			passwordStrength.style.color = 'yellow'
 			return 'medium'
 		} else {
+			passwordStrength.textContent = 'Password strength: Weak'
+			passwordStrength.style.color = 'red'
 			return 'weak'
 		}
 	}
@@ -89,7 +95,15 @@ function SignUp() {
 
 					<Form.Group className="mb-3" controlId="form_password">
 						<Form.Control type="password" placeholder="Password" className="border border-success" />
-						<p id="password_strength">Weak Password</p>
+						<p id="password-strength"></p>
+						<div className="rounded shadow p-3 text-left font-weight-light" style={{width: '450px'}}>
+							<h5>Password must met following conditions:</h5>
+							<p>Contain at least 8 characters</p>
+							<p>Contain at least one uppercase letter</p>
+							<p>Contain at least one lowercase letter</p>
+							<p>Contain at least one number</p>
+							<p>Contain at least one special character</p>
+						</div>
 					</Form.Group>
 
 					<Form.Group className="mb-3" controlId="form_registration_type">
