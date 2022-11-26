@@ -55,7 +55,6 @@ function Admin() {
 		fetch(`https://192.168.2.235/api/approveuser?id=${userID}&jwt=${loginData.data.token}`).then((res) => {
 			getUnverifiedUsers()
 		})
-		fetch(`https://192.168.2.235/api/test`).then((res) => {})
 	}
 	return (
 		<>

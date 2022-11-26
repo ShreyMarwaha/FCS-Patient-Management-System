@@ -59,9 +59,9 @@ function App() {
 							</div>
 						) : loginData.data.role === 'doctor' ? (
 							<div className="sidebar">
-								<Link className="sidebar-btn" to={'/Patient'}>
+								{/* <Link className="sidebar-btn" to={'/Patient'}>
 									View Patients
-								</Link>
+								</Link> */}
 
 								<Link className="sidebar-btn" to={'/Prescription'}>
 									Make Prescription
