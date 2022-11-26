@@ -13,6 +13,7 @@ import {useState, createContext} from 'react'
 import Admin from './pages/Admin'
 import Patient from './pages/Patient'
 import Prescription from './pages/Prescription'
+import Wallet from './pages/Wallet'
 
 export const DataContext = createContext()
 
@@ -59,12 +60,16 @@ function App() {
 							</div>
 						) : loginData.data.role === 'doctor' ? (
 							<div className="sidebar">
-								{/* <Link className="sidebar-btn" to={'/Patient'}>
+								<Link className="sidebar-btn" to={'/Patient'}>
 									View Patients
-								</Link> */}
+								</Link>
 
 								<Link className="sidebar-btn" to={'/Prescription'}>
 									Make Prescription
+								</Link>
+
+								<Link className="sidebar-btn" to={'/Wallet'}>
+									View Wallet
 								</Link>
 							</div>
 						) : (
@@ -72,9 +77,15 @@ function App() {
 								<Link className="sidebar-btn" to={'/search'}>
 									Search
 								</Link>
+
 								<Link className="sidebar-btn" to={'/Meds'}>
 									Buy Medicines
 								</Link>
+
+								<Link className="sidebar-btn" to={'/Wallet'}>
+									View Wallet
+								</Link>
+
 								{loginData.data.role === 'patient' ? (
 									<Link className="sidebar-btn" to={'/Documents'}>
 										My Documents
@@ -103,6 +114,7 @@ function App() {
 										<Route path="*" element={<Navigate replace to="/" />} />
 										<Route path="/Patient" element={<Patient />} />
 										<Route path="/Prescription" element={<Prescription />} />
+										<Route path="/Wallet" element={<Wallet />} />
 									</>
 								) : (
 									<>
