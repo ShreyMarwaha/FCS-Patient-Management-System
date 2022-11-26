@@ -419,3 +419,63 @@ app.post('/api/makeprescription', (req, res) => {
 		res.json({message: 'Prescription made Successfully!'})
 	})
 })
+
+app.get('/api/viewmywallet', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
+		const value = req.query.name
+		const email = req.query.email
+		const query = `SELECT  name, email, balance AS 'Wallet Balance' FROM wallet WHERE name LIKE ? AND email = ?`
+		con.query(query,value,email, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/fetchbalance', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
+		const name = req.query.name
+		const email = req.query.email
+		const query = `SELECT balance FROM wallet WHERE name LIKE ? AND email = ?`
+		con.query(query,name,email, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.post('/api/updatebalance', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
+		const name = req.body.name
+		const email = req.body.email
+		const balance = req.body.balance
+		const query = `UPDATE wallet SET balance = ? WHERE name LIKE ? and email = ?`
+
+		con.query(query,balance,name,email, (err) => {
+			if (err) throw err
+			res.status(200)
+			res.json({message: 'Balance Updated Successfully!'})
+		})
+	}
+})
