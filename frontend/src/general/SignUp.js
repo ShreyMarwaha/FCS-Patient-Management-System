@@ -23,7 +23,6 @@ function SignUp() {
 		if (!ValidateEmail(event.target.form_email.value) || !ValidateName(event.target.form_name.value)) {
 			return
 		}
-		return
 		data.uuid = uuidv4()
 
 		fetch('https://192.168.2.235/api/signup', {
@@ -60,7 +59,6 @@ function SignUp() {
 			alert('Invalid name given.')
 			return false
 		} else {
-			alert('Valid name given.')
 			return true
 		}
 	}
@@ -105,10 +103,10 @@ function SignUp() {
 							<option value="hospital">Pharmacy</option>
 						</Form.Select>
 					</Form.Group>
-					<Form.Group controlId="formFile" className="mb-3">
+					{/* <Form.Group controlId="formFile" className="mb-3">
 						<Form.Label>Default file input example</Form.Label>
 						<Form.Control type="file" />
-					</Form.Group>
+					</Form.Group> */}
 				</div>
 				<div>
 					<Button variant="primary" type="submit" style={{marginBottom: 20, width: 100, backgroundColor: 'var(--dark-green)', border: 0}}>
