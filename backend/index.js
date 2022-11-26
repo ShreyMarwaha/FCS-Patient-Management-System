@@ -24,7 +24,7 @@ app.use(BodyParser.json())
 app.use(
 	rateLimit({
 		windowMs: 60 * 1000, // 1 minute
-		max: 3, // limit each IP to 30 requests per windowMs
+		max: 20, // limit each IP to 30 requests per windowMs
 		keyGenerator: (req, res) => {
 			return req.clientIp // IP address from requestIp.mw(), as opposed to req.ip
 		},
@@ -273,13 +273,16 @@ app.post('/api/signup', (req, res) => {
 	con.query(`SELECT * FROM users WHERE email='${req.body.email}'`, (err, data) => {
 		if (err) throw err
 		if (data.length === 0) {
-			con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${req.body.uuid}','${req.body.name}', '${req.body.email}', '${req.body.registration_type}', '${password}', '${salt}')`, (err) => {
-				if (err) throw err
-				res.status(200)
-			})
+			if (req.body.registration_type === 'doctor' || req.body.registration_type === 'hospital' || req.body.registration_type === 'pharmacy' || req.body.registration_type === 'patient') {
+				con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${req.body.uuid}','${req.body.name}', '${req.body.email}', '${req.body.registration_type}', '${password}', '${salt}')`, (err) => {
+					if (err) throw err
+					res.status(200)
+				})
+			} else {
+				res.status(400)
+			}
 		} else {
 			res.json({message: 'User already exists'})
-			res.status(200)
 		}
 	})
 })
@@ -485,7 +488,9 @@ app.get('/api/searchmedicine', (req, res) => {
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'patient' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital' || decoded_token.role == 'pharmacy') {
 		const value = req.query.name
-		con.query(`SELECT medicines.name AS 'Medicine', medicines.dosage, medicines.price, pharmacy.name AS 'Pharmacy', pharmacy.city, pharmacy.state FROM medicines INNER JOIN pharmacy ON medicines.pharmacy_id = pharmacy.id WHERE medicines.name LIKE "%${value}%"`, (err, data) => {
+		const query = `SELECT medicines.name AS 'Medicine', medicines.dosage, medicines.price, pharmacy.name AS 'Pharmacy', pharmacy.city, pharmacy.state FROM medicines INNER JOIN pharmacy ON medicines.pharmacy_id = pharmacy.id WHERE medicines.name LIKE "%${value}%"`
+		console.log(query)
+		con.query(query, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
