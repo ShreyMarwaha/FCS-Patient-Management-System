@@ -61,7 +61,7 @@ var transporter = nodemailer.createTransport({
 const port = process.env.PORT || 5000
 app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) : console.log('Listening for Port ', port)))
 
-// API Definitions /////////////////////////////////////////////////
+// Util Functions /////////////////////////////////////////////////
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, '/uploads/')
@@ -74,7 +74,14 @@ const storage = multer.diskStorage({
 })
 
 var upload = multer({storage: storage}).single('file')
-
+function validateParameters(params) {
+	for (var i in params) {
+		if (i === undefined) {
+			return false
+		}
+	}
+	return true
+}
 function verify_jwt_signature(token) {
 	try {
 		const decodedToken = jwt.verify(token, JWT_SECRET)
@@ -111,6 +118,8 @@ function generateOTP(id, user_email) {
 	sendOTPviaMail(user_email, otp)
 }
 
+// API Definitions /////////////////////////////////////////////////
+
 app.get('/api/test', (req, res) => {
 	console.log('test api')
 	con.query(`SELECT * FROM users`, (err, data) => {
@@ -132,6 +141,11 @@ app.post('/api/upload_document', function (req, res) {
 })
 
 app.get('/api/searchdocs', (req, res) => {
+	const val = req.query.name
+	if (!validateParameters([val])) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -140,7 +154,6 @@ app.get('/api/searchdocs', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient') {
-		const val = req.query.name
 		con.query(`SELECT name, id FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -148,6 +161,11 @@ app.get('/api/searchdocs', (req, res) => {
 	}
 })
 app.get('/api/searchhospitals', (req, res) => {
+	const val = req.query.name
+	if (!validateParameters([val])) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -156,7 +174,6 @@ app.get('/api/searchhospitals', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient') {
-		const val = req.query.name
 		con.query(`SELECT name, id FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -164,6 +181,10 @@ app.get('/api/searchhospitals', (req, res) => {
 	}
 })
 app.get('/api/searchpharmacy', (req, res) => {
+	const val = req.query.name
+	if (!validateParameters([val])) {
+		res.json({status: 'missing parameters'})
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -172,7 +193,6 @@ app.get('/api/searchpharmacy', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient') {
-		const val = req.query.name
 		con.query(`SELECT name, id FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -182,6 +202,10 @@ app.get('/api/searchpharmacy', (req, res) => {
 
 app.get('/api/detailsdoc', (req, res) => {
 	const val = req.query.id
+	if (!validateParameters(params)) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	con.query(`SELECT doctors.name, doctors.city, doctors.state, hospitals.name as hospital FROM doctors LEFT JOIN hospitals ON doctors.hospital_id=hospitals.id WHERE doctors.id=${val}`, (err, data) => {
 		if (err) throw err
 		res.json({data})
@@ -189,6 +213,10 @@ app.get('/api/detailsdoc', (req, res) => {
 })
 app.get('/api/detailshos', (req, res) => {
 	const val = req.query.id
+	if (val === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	con.query(`SELECT name, city, state FROM hospitals WHERE id=${val}`, (err, data) => {
 		if (err) throw err
 		res.json({data})
@@ -196,12 +224,21 @@ app.get('/api/detailshos', (req, res) => {
 })
 app.get('/api/detailspha', (req, res) => {
 	const val = req.query.id
+	if (val === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	con.query(`SELECT name, city, state FROM pharmacy WHERE id=${val}`, (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
 })
 app.get('/api/detailsUser', (req, res) => {
+	const val = req.query.id
+	if (val === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -210,15 +247,21 @@ app.get('/api/detailsUser', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin') {
-		const val = req.query.id
 		con.query(`SELECT id, email, role, city, state, phone FROM users WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
+	} else {
+		res.json({status: 'unauthorized'})
 	}
 })
 
 app.get('/api/deletedoc', (req, res) => {
+	const val = req.query.id
+	if (val === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -227,14 +270,20 @@ app.get('/api/deletedoc', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'doctor' && decoded_token.id == req.query.id) {
-		const val = req.query.id
 		con.query(`DELETE FROM doctors WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
+	} else {
+		res.json({status: 'unauthorized'})
 	}
 })
 app.get('/api/deletehos', (req, res) => {
+	const val = req.query.id
+	if (val === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -243,14 +292,20 @@ app.get('/api/deletehos', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'hospital' && decoded_token.id == req.query.id) {
-		const val = req.query.id
 		con.query(`DELETE FROM hospitals WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
+	} else {
+		res.json({status: 'unauthorized'})
 	}
 })
 app.get('/api/deletepha', (req, res) => {
+	const val = req.query.id
+	if (val === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -259,11 +314,12 @@ app.get('/api/deletepha', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient' && decoded_token.id == req.query.id) {
-		const val = req.query.id
 		con.query(`DELETE FROM pharmacy WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
+	} else {
+		res.json({status: 'unauthorized'})
 	}
 })
 
@@ -291,6 +347,9 @@ app.post('/api/authToLogin', (req, res) => {
 	console.log('API: authToLogin')
 	const email = req.body.email
 	const entered_password = req.body.password
+	if (email === undefined && entered_password === undefined) {
+		res.json({status: 'missing parameters'})
+	}
 	con.query(`SELECT id, role, password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
 		if (err) throw err
 		if (data.length > 0) {
@@ -320,10 +379,14 @@ app.post('/api/authToLogin', (req, res) => {
 })
 
 app.post('/api/authenticate', (req, res) => {
+	console.log('API: authenticate')
 	const email = req.body.email
 	const entered_password = req.body.password
 	const otp = req.body.otp
-	console.log('API: authenticate')
+	if (otp === undefined || email === undefined || entered_password === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	console.log(req.body)
 	con.query(`SELECT id, role, password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
 		if (err) throw err
@@ -374,7 +437,7 @@ app.post('/api/authenticate', (req, res) => {
 						console.log('otp incorrect')
 						console.log('OTP user:server', otp, data2[0].otp)
 						console.log(typeof otp, typeof data2[0].otp)
-						console.log(data2[0].length, otp.length)
+						console.log(data2[0].otp.length, otp.length)
 						console.log('contents match?', data2[0].otp == otp)
 						res.json({error: 'otp invalid'})
 					}
@@ -479,6 +542,10 @@ app.get('/api/viewpatients', (req, res) => {
 })
 
 app.get('/api/searchmedicine', (req, res) => {
+	const value = req.query.name
+	if (value === undefined) {
+		res.json({status: 'missing parameters'})
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -487,9 +554,7 @@ app.get('/api/searchmedicine', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'patient' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital' || decoded_token.role == 'pharmacy') {
-		const value = req.query.name
 		const query = `SELECT medicines.name AS 'Medicine', medicines.dosage, medicines.price, pharmacy.name AS 'Pharmacy', pharmacy.city, pharmacy.state FROM medicines INNER JOIN pharmacy ON medicines.pharmacy_id = pharmacy.id WHERE medicines.name LIKE "%${value}%"`
-		console.log(query)
 		con.query(query, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -497,6 +562,10 @@ app.get('/api/searchmedicine', (req, res) => {
 	}
 })
 app.get('/api/searchmedicinebyid', (req, res) => {
+	const value = req.query.id
+	if (value === undefined || req.query.jwt === undefined) {
+		res.json({status: 'missing parameters'})
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -505,7 +574,6 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'patient' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital' || decoded_token.role == 'pharmacy') {
-		const value = req.query.id
 		con.query(`SELECT DISTINCT medicines.id, medicines.name AS 'Medicine', medicines.price AS 'Price' FROM medicines WHERE medicines.id = ${value}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -514,6 +582,11 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 })
 
 app.get('/api/approveuser', (req, res) => {
+	const id = req.query.id
+	if (id === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -522,7 +595,6 @@ app.get('/api/approveuser', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin') {
-		const id = req.query.id
 		const query = 'UPDATE users SET status = 1 WHERE id = ?'
 		con.query(query, [id], (err, data) => {
 			if (err) throw err
@@ -532,6 +604,11 @@ app.get('/api/approveuser', (req, res) => {
 })
 
 app.get('/api/searchpatientbyemail', (req, res) => {
+	const value = req.query.name
+	if (value === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -540,7 +617,6 @@ app.get('/api/searchpatientbyemail', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital') {
-		const value = req.query.name
 		con.query(`SELECT name, email FROM users WHERE email=${value} AND status=1 AND role="patient"`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -549,6 +625,7 @@ app.get('/api/searchpatientbyemail', (req, res) => {
 })
 
 app.post('/api/makeprescription', (req, res) => {
+	console.log('API: /api/makeprescription')
 	const prescriptionId = req.body.id
 	const doctorId = req.body.doctorId
 	const date = req.body.date
@@ -556,6 +633,10 @@ app.post('/api/makeprescription', (req, res) => {
 	const name = req.body.name
 	const prescription = req.body.prescription
 	console.log(req.body)
+	if (prescriptionId === undefined || doctorId === undefined || date === undefined || email === undefined || name === undefined || prescription === undefined) {
+		res.json({err: 'Missing parameters'})
+		return
+	}
 	con.query(`SELECT * FROM prescriptions WHERE patient_email='${email}'`, (err, data) => {
 		if (err) throw err
 		con.query(`INSERT INTO prescriptions (id, doctor_id, date, patient_email, patient_name, prescription) VALUES ('${prescriptionId}','${doctorId}', ${date}, '${email}', '${name}', '${prescription}')`, (err) => {
@@ -564,4 +645,27 @@ app.post('/api/makeprescription', (req, res) => {
 			res.json({message: 'Prescription made Successfully!'})
 		})
 	})
+})
+
+app.get('/api/viewmybalance', (req, res) => {
+	const value = req.query.name
+	if (value === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
+		con.query(`SELECT  name, email, balance AS 'Wallet Balance' FROM wallet WHERE name LIKE "%${value}%"`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	} else {
+		res.json({status: 'not authorized'})
+	}
 })
