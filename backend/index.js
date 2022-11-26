@@ -107,8 +107,8 @@ function generateOTP(id, user_email) {
 	con.query(`INSERT into otpTable (id, otp, expiry) values("${id}", "${otp}", ${expiry_time}) ON DUPLICATE KEY UPDATE otp="${otp}", expiry=${expiry_time}`, (err, data) => {
 		if (err) throw err
 	})
-	sendOTPviaMail('shrey19334@iiitd.ac.in', otp)
-	// sendOTPviaMail(user_email, otp)
+	// sendOTPviaMail('shrey19334@iiitd.ac.in', otp)
+	sendOTPviaMail(user_email, otp)
 }
 
 app.get('/api/test', (req, res) => {
