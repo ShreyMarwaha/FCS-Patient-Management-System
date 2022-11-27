@@ -325,21 +325,34 @@ app.get('/api/deletepha', (req, res) => {
 })
 
 app.post('/api/signup', (req, res) => {
+	console.log('API: signup')
+	const uuid = req.body.uuid
+	const name = req.body.name
+	const email = req.body.email
+	let password = req.body.password
+	const user_type = req.body.registration_type
+	console.log(req.body)
+
+	if (!validateParameters([uuid, name, email, password, user_type])) {
+		console.log('missing parameters')
+		res.json({status: 'missing parameters'})
+		return
+	}
 	const salt = bcrypt.genSaltSync(10)
-	const password = bcrypt.hashSync(req.body.password, salt)
-	con.query(`SELECT * FROM users WHERE email='${req.body.email}'`, (err, data) => {
+	password = bcrypt.hashSync(password, salt)
+	con.query(`SELECT * FROM users WHERE email='${email}'`, (err, data) => {
 		if (err) throw err
 		if (data.length === 0) {
-			if (req.body.registration_type === 'doctor' || req.body.registration_type === 'hospital' || req.body.registration_type === 'pharmacy' || req.body.registration_type === 'patient') {
-				con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${req.body.uuid}','${req.body.name}', '${req.body.email}', '${req.body.registration_type}', '${password}', '${salt}')`, (err) => {
+			if (user_type === 'doctor' || user_type === 'hospital' || user_type === 'pharmacy' || user_type === 'patient') {
+				con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${uuid}','${name}', '${email}', '${user_type}', '${password}', '${salt}')`, (err) => {
 					if (err) throw err
-					res.status(200)
+					res.json({message: 'successfully registered'})
 				})
 			} else {
-				res.status(400)
+				res.json({message: 'invalid user type'})
 			}
 		} else {
-			res.json({message: 'User already exists'})
+			res.json({message: 'user already exists'})
 		}
 	})
 })
@@ -648,9 +661,27 @@ app.post('/api/makeprescription', (req, res) => {
 	})
 })
 
-app.get('/api/viewmybalance', (req, res) => {
+app.get('/api/searchpatientbyemail', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role == 'admin' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital') {
+		const value = req.query.name
+		con.query(`SELECT  name, email FROM users WHERE email = "%${value}%" AND status = 1 AND role = "patient"`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/viewmywallet', (req, res) => {
+	console.log('API: /api/viewmywallet')
 	const value = req.query.name
-	if (value === undefined) {
+	if (!validateParameters([value])) {
 		res.json({status: 'missing parameters'})
 		return
 	}
@@ -668,23 +699,6 @@ app.get('/api/viewmybalance', (req, res) => {
 		})
 	} else {
 		res.json({status: 'not authorized'})
-	}
-})
-
-app.get('/api/searchpatientbyemail', (req, res) => {
-	let decoded_token
-	try {
-		decoded_token = verify_jwt_signature(req.query.jwt)
-	} catch (err) {
-		res.json({err})
-		return
-	}
-	if (decoded_token.role == 'admin' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital') {
-		const value = req.query.name
-		con.query(`SELECT  name, email FROM users WHERE email = "%${value}%" AND status = 1 AND role = "patient"`, (err, data) => {
-			if (err) throw err
-			res.json({data})
-		})
 	}
 })
 

@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import './general.css'
 import {v4 as uuidv4} from 'uuid'
 import Form from 'react-bootstrap/Form'
@@ -33,9 +33,13 @@ function SignUp() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				if (data.message && data.message === 'User already exists') {
+				if (data.hasOwnProperty('message') && data.message === 'user already exists') {
 					alert('Email already registered')
-				} else navigate('/')
+					navigate('/login')
+				} else if (data.hasOwnProperty('message') && data.message === 'successfully registered') {
+					alert('Registration successful')
+					navigate('/login')
+				} else alert('Registration failed')
 			})
 			.catch((error) => {
 				console.error('Error:', error)
@@ -80,7 +84,7 @@ function SignUp() {
 		}
 	}
 	return (
-		<Form onSubmit={handleSubmit} className="m-5">
+		<Form onSubmit={handleSubmit} className="m-5 py-5">
 			<center className="form">
 				<div>
 					<h3 style={{color: 'var(--dark-green)'}}>Sign Up</h3>
@@ -108,10 +112,8 @@ function SignUp() {
 
 					<Form.Group className="mb-3" controlId="form_registration_type">
 						<Form.Label>Register as...</Form.Label>
-						<Form.Select className="form-control">
-							<option selected value="patient">
-								Patient
-							</option>
+						<Form.Select className="form-control" defaultValue="patient">
+							<option value="patient">Patient</option>
 							<option value="doctor">Doctor</option>
 							<option value="hospital">Hospital</option>
 							<option value="hospital">Pharmacy</option>

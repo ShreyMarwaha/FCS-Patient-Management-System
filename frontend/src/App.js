@@ -119,7 +119,7 @@ function App() {
 								) : (
 									<>
 										<Route exact path="/" element={<Login />} />
-										<Route path="/" element={<Login />} />
+										<Route path="/login" element={<Login />} />
 										<Route path="/sign-up" element={<SignUp />} />
 										<Route path="*" element={<Navigate replace to="/" />} />
 									</>
