@@ -39,7 +39,7 @@ function SignUp() {
 			alert('Please upload a pdf file')
 			return
 		}
-		if (getExtension(file.name) !== 'pdf' || getExtension(file.name) !== 'jpg' || getExtension(file.name) !== 'jpeg') {
+		if (getExtension(file.name) !== 'pdf' && getExtension(file.name) !== 'jpg' && getExtension(file.name) !== 'jpeg') {
 			alert('Only pdf/jpg/jpeg files are allowed')
 			return
 		}
