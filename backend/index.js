@@ -75,7 +75,7 @@ const storage = multer.diskStorage({
 		} else if (doc_type_supported.includes(req.body.doc_type)) {
 			const path = `${base_dir}/${req.body.uuid}`
 			console.log('Path: ', path)
-			addDocumentDetails(req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, path + '/' + req.body.doc_id + '.' + file.originalname.split('.').pop())
+			addDocumentDetails(req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, req.body.uuid + '/' + req.body.doc_id + '.' + file.originalname.split('.').pop())
 			cb(null, path)
 		} else {
 			deleteUser(req.body.uuid)
