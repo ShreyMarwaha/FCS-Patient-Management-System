@@ -859,7 +859,7 @@ app.get('/api/updateClaimStatus', (req, res) => {
 			res.send('Deleted Claim ' + id)
 		} else {
 			// const query = 'UPDATE claims SET status = ? WHERE id = ?'
-			con.query(`UPDATE claims SET status = ${status} WHERE id LIKE "%${id}"%`, (err, data) => {
+			con.query(`UPDATE claims SET status = ${status} WHERE id = ${id}`, (err, data) => {
 				if (err) throw err
 				res.send('Updated status of Claim ' + id + ' to ' + status)
 			})
