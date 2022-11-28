@@ -4,17 +4,19 @@ import { Link } from 'react-router-dom'
 import '../components/components.css'
 import React, { Component } from 'react'
 import {DataContext} from '../App'
+import { LogicNand } from 'tabler-icons-react'
 
 let output = []
 
 function Wallet() {
 
 	const {loginData, setLoginData} = useContext(DataContext)
-    var name = loginData.data.name
-    var email = loginData.data.email
+	var id = loginData.data.id
+	var name = loginData.data.name
+	var email = loginData.data.email
 
 	function viewBalance() {
-		fetch(`https://192.168.2.235/api/viewmywallet?name="${name}"&email="${email}"&jwt=${loginData.data.token}`).then((res) => {
+		fetch(`https://192.168.2.235/api/viewmywallet?id=${id}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length===0) {
                     alert("User Wallet Not Found !!")
@@ -30,12 +32,11 @@ function Wallet() {
     function updateBalance() {
         let previousBalance
         const data = {}
-
+		data.id = loginData.data.id
         data.name = loginData.data.name
-        data.email = loginData.data.email
         data.balance = 0                    // set the value to be the one added to the balance
 
-        fetch(`https://192.168.2.235/api/fetchbalance?name="${name}"&email=${email}&jwt=${loginData.data.token}`).then((res) => {
+        fetch(`https://192.168.2.235/api/fetchbalance?id="${id}"&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length===0) {
                     alert("User Wallet Not Found !!")
