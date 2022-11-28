@@ -149,6 +149,14 @@ function deleteUser(uuid) {
 	})
 }
 
+function deleteClaim(uuid){
+	console.log('FUNC: deleteClaim', uuid)
+	con.query(`DELETE FROM claims WHERE id="${uuid}"`, (err, data) => {
+		if (err) throw err
+		console.log('Claim deleted')
+	})
+}
+
 function makeUserDirectoryStructure(uuid) {
 	console.log('FUNC: makeUserDirectoryStructure', uuid)
 	const dir = `${base_dir}/${uuid}`
@@ -790,4 +798,60 @@ app.post('/api/updatebalance', (req, res) => {
 			res.json({message: 'Balance Updated Successfully!'})
 		})
 	}
+})
+
+app.get('/api/viewclaims', (req, res) => {
+	const value = req.query.id
+	if (value === undefined || req.query.jwt === undefined) {
+		res.json({status: 'missing parameters'})
+	}
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	const query = 'SELECT * FROM claims WHERE insurance_company_id LIKE ?'
+	if (decoded_token.role == 'insurance') {
+		con.query(query, [value], (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/updateClaimStatus', (req, res) => {
+	const id = req.query.id
+	const status = req.query.status
+	if (id === undefined || status === undefined) {
+		res.json({status: 'missing parameters'})
+		return
+	}
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role === 'insurance' && 0 <= status && status <= 3) {
+		if (status === 3) {
+			deleteClaim(id)
+			res.send('Deleted Claim ' + id)
+		} else {
+			const query = 'UPDATE claims SET status = ? WHERE id = ?'
+			con.query(query, [status, id], (err, data) => {
+				if (err) throw err
+				// if (status === 1) {
+				// 	const walletquery = 'INSERT INTO wallet (userid, balance) VALUES (?, 0)'
+				// 	con.query(walletquery, [id], (err, data) => {
+				// 		if (err) throw err
+				// 		res.send('User approved & User Wallet Created')
+				// 	})
+				// } else 
+				res.send('Updated status of Claim ' + id + ' to ' + status)
+			})
+		}
+	} else res.send('Not authorized to update claim status.')
 })
