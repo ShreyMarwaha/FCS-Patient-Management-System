@@ -45,6 +45,7 @@ con.on('error', function (err) {
 
 const JWT_SECRET = 'mq0g8!0f^DsHYjlq1G^nX0it&E384isrWOiTY05q&M!#RPSrM!'
 const base_dir = '/var/www/uploads'
+const roles = ['admin', 'patient', 'doctor', 'pharmacy', 'insurance', 'hospital']
 const razorpay = new Razorpay({
 	key_id: 'rzp_test_lzmoFzw17LDqLa',
 	key_secret: '6GBr3MchuCrHvUoOwOT5NMfq',
@@ -394,9 +395,12 @@ app.post('/api/signup', (req, res) => {
 	const uuid = req.body.uuid
 	const name = req.body.name
 	const email = req.body.email
+	const state = req.body.state
+	const city = req.body.city
+	const phone = req.body.phone
 	let password = req.body.password
 	const user_type = req.body.registration_type
-	if (!validateParameters([uuid, name, email, password, user_type])) {
+	if (!validateParameters([uuid, name, email, password, user_type, state, city, phone])) {
 		console.log('missing parameters')
 		res.json({status: 'missing parameters'})
 		return
@@ -406,8 +410,9 @@ app.post('/api/signup', (req, res) => {
 	con.query(`SELECT * FROM users WHERE email='${email}'`, (err, data) => {
 		if (err) throw err
 		if (data.length === 0) {
-			if (user_type === 'doctor' || user_type === 'hospital' || user_type === 'pharmacy' || user_type === 'patient') {
-				con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${uuid}','${name}', '${email}', '${user_type}', '${password}', '${salt}')`, (err) => {
+			if (roles.includes(user_type)) {
+				const query = `INSERT INTO users VALUES ('${uuid}', '${email}', '${user_type}', '${city}', '${state}', '${phone}', 0, '${password}', '${salt}', '${name}')`
+				con.query(query, (err) => {
 					if (err) throw err
 					makeUserDirectoryStructure(uuid)
 					res.json({message: 'successfully registered'})

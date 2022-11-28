@@ -67,7 +67,7 @@ function Admin() {
 									Phone
 								</th>
 								<th className="text-secondary" scope="col">
-									Approve
+									Action
 								</th>
 							</tr>
 						</thead>
@@ -128,7 +128,7 @@ function Admin() {
 									Phone
 								</th>
 								<th className="text-secondary" scope="col">
-									Approve
+									Action
 								</th>
 							</tr>
 						</thead>
@@ -183,7 +183,7 @@ function Admin() {
 									Phone
 								</th>
 								<th className="text-secondary" scope="col">
-									Approve
+									Action
 								</th>
 							</tr>
 						</thead>
