@@ -943,7 +943,7 @@ app.get('/api/mydocs', (req, res) => {
 		return
 	}
 	if (roles.includes(decoded_token.role)) {
-		con.query(`SELECT id, issued_to, doc_type, path FROM documents WHERE issued_by="${decoded_token.userId}"`, (err, data) => {
+		con.query(`SELECT documents.id, users.name, users.role, documents.doc_type, documents.path FROM documents INNER JOIN users ON documents.issued_to=users.id WHERE documents.issued_by='${decoded_token.userId}'`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})

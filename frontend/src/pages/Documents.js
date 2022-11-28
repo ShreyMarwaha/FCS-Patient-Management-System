@@ -125,7 +125,10 @@ function Documents() {
 						<thead>
 							<tr className="text-center">
 								<th className="text-secondary" scope="col">
-									Shared To
+									Shared To Name
+								</th>
+								<th className="text-secondary" scope="col">
+									Shared To Role
 								</th>
 								<th className="text-secondary pl-0" scope="col">
 									Document Type
@@ -142,7 +145,8 @@ function Documents() {
 						<tbody>
 							{myDocuments.map((doc) => (
 								<tr className="my-2 py-2" key={doc.id}>
-									<td className="pl-0 ">{doc.issued_to}</td>
+									<td className="pl-0 ">{doc.name}</td>
+									<td className="pl-0 ">{doc.role}</td>
 									<td className="pl-0">{doc.doc_type}</td>
 									<td>
 										<a href={`https://192.168.2.235/docs/${doc.path}`}>File</a>
