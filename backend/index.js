@@ -43,7 +43,7 @@ con.on('error', function (err) {
 })
 
 const JWT_SECRET = 'mq0g8!0f^DsHYjlq1G^nX0it&E384isrWOiTY05q&M!#RPSrM!'
-const base_dir = '/var/www/FCS-Patient-Management-System'
+const base_dir = '/var/www/uploads'
 const razorpay = new Razorpay({
 	key_id: 'rzp_test_lzmoFzw17LDqLa',
 	key_secret: '6GBr3MchuCrHvUoOwOT5NMfq',
@@ -64,7 +64,7 @@ app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		console.log('choosing destination', req.body.doc_type)
-		let path = '../uploads/' + req.body.uuid + '/' + req.body.doc_type
+		let path = base_dir + '/' + req.body.uuid + '/' + req.body.doc_type
 		const doc_type_supported = ['identity', 'prescription']
 		if (!file.originalname.match(/\.(pdf|jpg|jpeg)$/)) {
 			console.log('Not a supported file extension')
@@ -148,8 +148,9 @@ function deleteUser(uuid) {
 function makeUserDirectoryStructure(uuid) {
 	console.log('FUNC: makeUserDirectoryStructure', uuid)
 
-	const dirs = [`${base_dir}/uploads/${uuid}/identity`, `${base_dir}/uploads/${uuid}/prescription`]
+	const dirs = [`/${uuid}/identity`, `/${uuid}/prescription`, `/${uuid}/bills`]
 	dirs.forEach((dir) => {
+		dir = base_dir + dir
 		if (!fs.existsSync(dir)) {
 			fs.mkdirSync(dir, {recursive: true})
 		}
