@@ -370,7 +370,7 @@ app.get('/api/deletedoc', (req, res) => {
 		res.json({err})
 		return
 	}
-	if (decoded_token.role == 'doctor' && decoded_token.id == req.query.id) {
+	if (decoded_token.role == 'doctor' && decoded_token.userId == req.query.id) {
 		con.query(`DELETE FROM doctors WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -392,7 +392,7 @@ app.get('/api/deletehos', (req, res) => {
 		res.json({err})
 		return
 	}
-	if (decoded_token.role == 'hospital' && decoded_token.id == req.query.id) {
+	if (decoded_token.role == 'hospital' && decoded_token.userId == req.query.id) {
 		con.query(`DELETE FROM hospitals WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -415,7 +415,7 @@ app.get('/api/deletepha', (req, res) => {
 		res.json({err})
 		return
 	}
-	if (decoded_token.role == 'patient' && decoded_token.id == req.query.id) {
+	if (decoded_token.role == 'patient' && decoded_token.userId == req.query.id) {
 		con.query(`DELETE FROM pharmacy WHERE id=${val}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
@@ -930,8 +930,8 @@ app.get('/api/sharing', (req, res) => {
 	}
 })
 
-app.get('/api/myDocuements', (req, res) => {
-	console.log('API: /api/myDocuments')
+app.get('/api/mydocs', (req, res) => {
+	console.log('API: /api/mydocs')
 	if (req.query.jwt === undefined) {
 		res.json({status: 'missing parameters'})
 	}
@@ -943,7 +943,7 @@ app.get('/api/myDocuements', (req, res) => {
 		return
 	}
 	if (roles.includes(decoded_token.role)) {
-		con.query(`SELECT id, issued_to, doc_type, path FROM dcuments WHERE issued_by=${decoded_token.id}`, (err, data) => {
+		con.query(`SELECT id, issued_to, doc_type, path FROM documents WHERE issued_by="${decoded_token.userId}"`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -962,8 +962,8 @@ app.get('/api/deleteDoc', (req, res) => {
 		res.json({err})
 		return
 	}
-	if (roles.includes(decoded_token.role) && decoded_token.id === req.query.issued_by) {
-		con.query(`DELETE FROM documents WHERE issued_by=${decoded_token.id}`, (err, data) => {
+	if (roles.includes(decoded_token.role) && decoded_token.userId === req.query.issued_by) {
+		con.query(`DELETE FROM documents WHERE issued_by="${decoded_token.userId}"`, (err, data) => {
 			if (err) throw err
 			res.json({message: 'delete successfully'})
 		})

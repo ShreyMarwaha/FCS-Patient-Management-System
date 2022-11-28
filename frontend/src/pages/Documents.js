@@ -17,6 +17,7 @@ function Documents() {
 	}
 	useEffect(() => {
 		getDocumentSharingOptions()
+		getMyDocuments()
 	}, [])
 
 	function getDocumentSharingOptions() {
@@ -33,13 +34,14 @@ function Documents() {
 	}
 
 	function getMyDocuments() {
-		fetch(`https://192.168.2.235/api/myDocuments?jwt=${loginData.data.token}`).then((res) => {
+		fetch(`https://192.168.2.235/api/mydocs?jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.hasOwnProperty('err') || data.data.length === 0) {
 					console.log('No sharing options present !!')
 				} else {
-					console.log(data)
-					setSharingOptions(data.data)
+					console.log('docs', data)
+
+					setMyDocuments(data.data)
 				}
 			})
 		})
