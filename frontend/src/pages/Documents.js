@@ -1,13 +1,12 @@
-import {useRef, useState} from 'react'
+import React, {useState} from 'react'
 import axios from 'axios'
-import React, { Component } from 'react'
 
 function Documents() {
 	const [file, setFile] = useState('') // storing the uploaded file
 	// storing the recived file from backend
 	const [progress, setProgess] = useState(0) // progess bar
 
-	const handleChange = (e) => {
+	const handleFileChange = (e) => {
 		setProgess(0)
 		const file = e.target.files[0] // accessing file
 		console.log(file)
@@ -16,9 +15,10 @@ function Documents() {
 
 	const uploadFile = () => {
 		const formData = new FormData()
+		formData.append('doc_type', 'identity') // appending file
 		formData.append('file', file) // appending file
 		axios
-			.post('https://192.168.2.235/api/upload', formData, {
+			.post('https://192.168.2.235/api/upload_document', formData, {
 				onUploadProgress: (ProgressEvent) => {
 					let progress = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
 					setProgess(progress)
@@ -33,7 +33,7 @@ function Documents() {
 	return (
 		<div>
 			<div className="file-upload">
-				<input type="file" onChange={handleChange} />
+				<input type="file" onChange={handleFileChange} />
 				<div className="progessBar" style={{width: progress}}>
 					{progress < 100 ? progress + '%' : <p className="text-success">Upload Complete!</p>}
 				</div>
