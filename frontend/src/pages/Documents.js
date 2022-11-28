@@ -26,7 +26,7 @@ function Documents() {
 					console.log('No sharing options present !!')
 				} else {
 					console.log(data)
-					myDocuments(data.data)
+					setSharingOptions(data.data)
 				}
 			})
 		})
@@ -46,10 +46,11 @@ function Documents() {
 	}
 
 	function createSelectOptions() {
-		const options = []
+		let options = []
 		sharingOptions.forEach((option) => {
 			options.push({value: option.id, label: `${option.role}-${option.name}`})
 		})
+		console.log(options)
 		return options
 	}
 

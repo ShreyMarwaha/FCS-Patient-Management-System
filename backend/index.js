@@ -232,7 +232,9 @@ app.post('/api/upload_document', function (req, res) {
 })
 
 app.get('/api/searchdocs', (req, res) => {
-	const val = req.query.name
+	console.log('API: searchdocs')
+	const val = '%' + req.query.name + '%'
+
 	if (!validateParameters([val])) {
 		res.json({status: 'missing parameters'})
 		return
@@ -247,13 +249,14 @@ app.get('/api/searchdocs', (req, res) => {
 	if (decoded_token.role == 'patient') {
 		const query = 'SELECT name, id FROM doctors WHERE name LIKE ?'
 		con.query(query, [val], (err, data) => {
+			console.log(query.sql, val)
 			if (err) throw err
 			res.json({data})
 		})
 	}
 })
 app.get('/api/searchhospitals', (req, res) => {
-	const val = req.query.name
+	const val = '%' + req.query.name + '%'
 	if (!validateParameters([val])) {
 		res.json({status: 'missing parameters'})
 		return
@@ -274,7 +277,7 @@ app.get('/api/searchhospitals', (req, res) => {
 	}
 })
 app.get('/api/searchpharmacy', (req, res) => {
-	const val = req.query.name
+	const val = '%' + req.query.name + '%'
 	if (!validateParameters([val])) {
 		res.json({status: 'missing parameters'})
 	}
@@ -650,7 +653,7 @@ app.get('/api/viewpatients', (req, res) => {
 })
 
 app.get('/api/searchmedicine', (req, res) => {
-	const value = req.query.name
+	const value = '%' + req.query.name + '%'
 	if (value === undefined) {
 		res.json({status: 'missing parameters'})
 	}
