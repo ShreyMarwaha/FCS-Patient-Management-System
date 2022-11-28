@@ -98,7 +98,7 @@ function Admin() {
 				) : (
 					<center>
 						<div className="bg-danger rounded p-2 d-flex justify-content-center align-items-center">
-							<h5>No slots added/All added slots have been booked</h5>
+							<h5>No unverified Users</h5>
 						</div>
 					</center>
 				)}
