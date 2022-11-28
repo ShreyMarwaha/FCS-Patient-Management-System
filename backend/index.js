@@ -60,6 +60,17 @@ var transporter = nodemailer.createTransport({
 	},
 })
 
+function checkParameters(query) {
+	console.log(query)
+	const {userQuery} = query
+	const onlyLettersPattern = /^[a-zA-Z]([\w -]*[a-zA-Z])?$/
+
+	if (!userQuery.match(onlyLettersPattern)) {
+		console.log('cbuberjh')
+		return res.json({err: 'No special characters and no numbers!'})
+	} else return true
+}
+
 const port = process.env.PORT || 5000
 app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) : console.log('Listening for Port ', port)))
 
@@ -179,6 +190,7 @@ function makeUserDirectoryStructure(uuid) {
 
 app.get('/api/test', (req, res) => {
 	console.log('test api')
+
 	con.query(`SELECT * FROM users`, (err, data) => {
 		if (err) throw err
 		if (data.length > 0) res.send('working')
@@ -233,7 +245,8 @@ app.get('/api/searchdocs', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient') {
-		con.query(`SELECT name, id FROM doctors WHERE name LIKE '%${val}%'`, (err, data) => {
+		const query = 'SELECT name, id FROM doctors WHERE name LIKE ?'
+		con.query(query, [val], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -253,7 +266,8 @@ app.get('/api/searchhospitals', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient') {
-		con.query(`SELECT name, id FROM hospitals WHERE name LIKE '%${val}%'`, (err, data) => {
+		const query = 'SELECT name, id FROM hospitals WHERE name LIKE ?'
+		con.query(query, [val], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -272,7 +286,8 @@ app.get('/api/searchpharmacy', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'patient') {
-		con.query(`SELECT name, id FROM pharmacy WHERE name LIKE '%${val}%'`, (err, data) => {
+		const query = 'SELECT name, id FROM pharmacy WHERE name LIKE ?'
+		con.query(query, [val], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -285,7 +300,8 @@ app.get('/api/detailsdoc', (req, res) => {
 		res.json({status: 'missing parameters'})
 		return
 	}
-	con.query(`SELECT doctors.name, doctors.city, doctors.state, hospitals.name as hospital FROM doctors LEFT JOIN hospitals ON doctors.hospital_id=hospitals.id WHERE doctors.id=${val}`, (err, data) => {
+	const query = 'SELECT doctors.name, doctors.city, doctors.state, hospitals.name as hospital FROM doctors LEFT JOIN hospitals ON doctors.hospital_id=hospitals.id WHERE doctors.id = ?'
+	con.query(query, [val], (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
@@ -296,7 +312,8 @@ app.get('/api/detailshos', (req, res) => {
 		res.json({status: 'missing parameters'})
 		return
 	}
-	con.query(`SELECT name, city, state FROM hospitals WHERE id=${val}`, (err, data) => {
+	const query = 'SELECT name, city, state FROM hospitals WHERE id = ?'
+	con.query(query, [val], (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
@@ -307,7 +324,8 @@ app.get('/api/detailspha', (req, res) => {
 		res.json({status: 'missing parameters'})
 		return
 	}
-	con.query(`SELECT name, city, state FROM pharmacy WHERE id=${val}`, (err, data) => {
+	const query = 'SELECT name, city, state FROM pharmacy WHERE id = ?'
+	con.query(query, [val], (err, data) => {
 		if (err) throw err
 		res.json({data})
 	})
@@ -326,7 +344,8 @@ app.get('/api/detailsUser', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin') {
-		con.query(`SELECT id, email, role, city, state, phone FROM users WHERE id=${val}`, (err, data) => {
+		const query = 'SELECT id, email, role, city, state, phone FROM users WHERE id = ?'
+		con.query(query, [val], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -421,7 +440,8 @@ app.post('/api/signup', (req, res) => {
 	}
 	const salt = bcrypt.genSaltSync(10)
 	password = bcrypt.hashSync(password, salt)
-	con.query(`SELECT * FROM users WHERE email='${email}'`, (err, data) => {
+	const query = 'SELECT * FROM users WHERE email = ?'
+	con.query(query, [email], (err, data) => {
 		if (err) throw err
 		if (data.length === 0) {
 			if (roles.includes(user_type)) {
@@ -449,7 +469,8 @@ app.post('/api/authToLogin', (req, res) => {
 	if (email === undefined && entered_password === undefined) {
 		res.json({status: 'missing parameters'})
 	}
-	con.query(`SELECT id, role, password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
+	const query = 'SELECT id, role, password, salt, status FROM users WHERE email = ?'
+	con.query(query, [email], (err, data) => {
 		if (err) throw err
 		if (data.length > 0) {
 			const password = bcrypt.hashSync(entered_password, data[0].salt)
@@ -487,7 +508,8 @@ app.post('/api/authenticate', (req, res) => {
 		return
 	}
 	console.log(req.body)
-	con.query(`SELECT id, role, password, salt, status FROM users WHERE email="${email}"`, (err, data) => {
+	const query1 = 'SELECT id, role, password, salt, status FROM users WHERE email = ?'
+	con.query(query1, [email], (err, data) => {
 		if (err) throw err
 		console.log('query1', data)
 		if (data.length > 0) {
@@ -505,7 +527,8 @@ app.post('/api/authenticate', (req, res) => {
 					return
 				}
 				console.log('user verified')
-				con.query(`SELECT otp, expiry FROM otpTable WHERE id="${data[0].id}"`, (err, data2) => {
+				const query2 = 'SELECT otp, expiry FROM otpTable WHERE id = ?'
+				con.query(query2, [data[0].id], (err, data2) => {
 					console.log('query2', data2)
 					if (data2[0].otp === otp && data2[0].expiry > Date.now()) {
 						console.log('otp correct')
@@ -639,13 +662,15 @@ app.get('/api/searchmedicine', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'patient' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital' || decoded_token.role == 'pharmacy') {
-		const query = `SELECT medicines.name AS 'Medicine', medicines.dosage, medicines.price, pharmacy.name AS 'Pharmacy', pharmacy.city, pharmacy.state FROM medicines INNER JOIN pharmacy ON medicines.pharmacy_id = pharmacy.id WHERE medicines.name LIKE "%${value}%"`
-		con.query(query, (err, data) => {
+		const query = `SELECT medicines.name AS 'Medicine', medicines.dosage, medicines.price, pharmacy.name AS 'Pharmacy', pharmacy.city, pharmacy.state FROM medicines INNER JOIN pharmacy ON medicines.pharmacy_id = pharmacy.id WHERE medicines.name LIKE ?`
+
+		con.query(query, [value], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
 	}
 })
+
 app.get('/api/searchmedicinebyid', (req, res) => {
 	const value = req.query.id
 	if (value === undefined || req.query.jwt === undefined) {
@@ -659,7 +684,8 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'patient' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital' || decoded_token.role == 'pharmacy') {
-		con.query(`SELECT DISTINCT medicines.id, medicines.name AS 'Medicine', medicines.price AS 'Price' FROM medicines WHERE medicines.id = ${value}`, (err, data) => {
+		const query = 'SELECT DISTINCT medicines.id, medicines.name AS "Medicine", medicines.price AS "Price" FROM medicines WHERE medicines.id = ?'
+		con.query(query, [value], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -689,7 +715,7 @@ app.get('/api/updateUserStatus', (req, res) => {
 			con.query(query, [status, id], (err, data) => {
 				if (err) throw err
 				if (status === 1) {
-					const walletquery = 'INSERT INTO wallet (userid, balance) VALUES (?, 0)'
+					const walletquery = 'INSERT INTO wallet (userid, balance) VALUES ( ? , 0)'
 					con.query(walletquery, [id], (err, data) => {
 						if (err) throw err
 						res.send('User approved & User Wallet Created')
@@ -714,7 +740,8 @@ app.get('/api/searchpatientbyemail', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital') {
-		con.query(`SELECT name, email FROM users WHERE email=${value} AND status=1 AND role="patient"`, (err, data) => {
+		const query = 'SELECT name, email FROM users WHERE email = ? AND status = 1 AND role = "patient"'
+		con.query(query, [value], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -734,9 +761,11 @@ app.post('/api/makeprescription', (req, res) => {
 		res.json({err: 'Missing parameters'})
 		return
 	}
-	con.query(`SELECT * FROM prescriptions WHERE patient_email='${email}'`, (err, data) => {
+	const q1 = 'SELECT * FROM prescriptions WHERE patient_email = ?'
+	const q2 = 'INSERT INTO prescriptions (id, doctor_id, date, patient_email, patient_name, prescription) VALUES (?, ?, ?, ? ,?, ?)'
+	con.query(q1, [email], (err, data) => {
 		if (err) throw err
-		con.query(`INSERT INTO prescriptions (id, doctor_id, date, patient_email, patient_name, prescription) VALUES ('${prescriptionId}','${doctorId}', ${date}, '${email}', '${name}', '${prescription}')`, (err) => {
+		con.query(q2, [prescriptionId, doctorId, date, email, name, prescription], (err) => {
 			if (err) throw err
 			res.status(200)
 			res.json({message: 'Prescription made Successfully!'})
@@ -754,7 +783,8 @@ app.get('/api/searchpatientbyemail', (req, res) => {
 	}
 	if (decoded_token.role == 'admin' || decoded_token.role == 'doctor' || decoded_token.role == 'hospital') {
 		const value = req.query.name
-		con.query(`SELECT  name, email FROM users WHERE email = "%${value}%" AND status = 1 AND role = "patient"`, (err, data) => {
+		const query = 'SELECT  name, email FROM users WHERE email = ? AND status = 1 AND role = "patient"'
+		con.query(query, [value], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -762,7 +792,7 @@ app.get('/api/searchpatientbyemail', (req, res) => {
 })
 
 app.get('/api/viewmywallet', (req, res) => {
-	console.log('API: /api/viewmywallet')
+	console.log('viewmywallet')
 	const value = req.query.id
 	if (!validateParameters([value])) {
 		res.json({status: 'missing parameters'})
@@ -776,7 +806,8 @@ app.get('/api/viewmywallet', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
-		con.query(`SELECT balance AS 'Wallet Balance' FROM wallet WHERE userid LIKE "%${value}%"`, (err, data) => {
+		const query = 'SELECT balance AS "Wallet Balance" FROM wallet WHERE userid = ?'
+		con.query(query, [value], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -795,8 +826,8 @@ app.get('/api/fetchbalance', (req, res) => {
 	}
 	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
 		const id = req.query.id
-		const query = `SELECT balance FROM wallet WHERE userid LIKE ?`
-		con.query(query, name, email, (err, data) => {
+		const query = `SELECT balance FROM wallet WHERE userid = ?`
+		con.query(query, [id], (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -814,9 +845,9 @@ app.post('/api/updatebalance', (req, res) => {
 	if (decoded_token.role == 'doctor' || decoded_token.role == 'patient' || decoded_token.role == 'pharmacy' || decoded_token.role == 'hospital') {
 		const id = req.body.id
 		const balance = req.body.balance
-		const query = `UPDATE wallet SET balance = ? WHERE userid LIKE ?`
+		const query = `UPDATE wallet SET balance = ? WHERE userid = ?`
 
-		con.query(query, balance, id, (err) => {
+		con.query(query, [balance, id], (err) => {
 			if (err) throw err
 			res.status(200)
 			res.json({message: 'Balance Updated Successfully!'})
@@ -825,7 +856,9 @@ app.post('/api/updatebalance', (req, res) => {
 })
 
 app.get('/api/viewclaims', (req, res) => {
+	console.log('API : viewclaims')
 	const value = req.query.id
+	console.log('valid check')
 	if (value === undefined || req.query.jwt === undefined) {
 		res.json({status: 'missing parameters'})
 	}
@@ -837,8 +870,10 @@ app.get('/api/viewclaims', (req, res) => {
 		return
 	}
 	if (decoded_token.role == 'insurance') {
-		con.query(`SELECT * FROM claims WHERE insurance_company_id = ${value}`, (err, data) => {
+		const query = 'SELECT * FROM claims WHERE insurance_company_id = ?'
+		con.query(query, [value], (err, data) => {
 			if (err) throw err
+			console.log(data)
 			res.json({data})
 		})
 	}
@@ -863,8 +898,8 @@ app.get('/api/updateClaimStatus', (req, res) => {
 			deleteClaim(id)
 			res.send('Deleted Claim ' + id)
 		} else {
-			// const query = 'UPDATE claims SET status = ? WHERE id = ?'
-			con.query(`UPDATE claims SET status = ${status} WHERE id = ${id}`, (err, data) => {
+			const query = 'UPDATE claims SET status = ? WHERE id = ?'
+			con.query(query, [status, id], (err, data) => {
 				if (err) throw err
 				res.send('Updated status of Claim ' + id + ' to ' + status)
 			})
