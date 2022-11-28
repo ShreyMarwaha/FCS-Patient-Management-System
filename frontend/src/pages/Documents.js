@@ -2,6 +2,7 @@ import React, {useState, useContext, useEffect} from 'react'
 import axios from 'axios'
 import Select from 'react-select'
 import {DataContext} from '../App'
+import {v4 as uuidv4} from 'uuid'
 
 function Documents() {
 	const {loginData, setLoginData} = useContext(DataContext)
@@ -9,6 +10,15 @@ function Documents() {
 	const [myDocuments, setMyDocuments] = useState([])
 	const [progress, setProgess] = useState(0) // progess bar
 	const [sharingOptions, setSharingOptions] = useState([])
+	const [docType, setDocType] = useState(undefined)
+	const [shareTo, setShareTo] = useState(undefined)
+
+	const doc_type_supported = [
+		{label: 'identity', value: 'identity'},
+		{label: 'prescription', value: 'prescription'},
+		{label: 'reports', value: 'reports'},
+		{label: 'bills', value: 'bills'},
+	]
 	const handleFileChange = (e) => {
 		setProgess(0)
 		const file = e.target.files[0] // accessing file
@@ -26,7 +36,6 @@ function Documents() {
 				if (data.hasOwnProperty('err') || data.data.length === 0) {
 					console.log('No sharing options present !!')
 				} else {
-					console.log(data)
 					setSharingOptions(data.data)
 				}
 			})
@@ -39,8 +48,6 @@ function Documents() {
 				if (data.hasOwnProperty('err') || data.data.length === 0) {
 					console.log('No sharing options present !!')
 				} else {
-					console.log('docs', data)
-
 					setMyDocuments(data.data)
 				}
 			})
@@ -52,7 +59,6 @@ function Documents() {
 		sharingOptions.forEach((option) => {
 			options.push({value: option.id, label: `${option.role}-${option.name}`})
 		})
-		console.log(options)
 		return options
 	}
 
@@ -60,9 +66,22 @@ function Documents() {
 		fetch(`https://192.168.2.235/api/deleteDoc?jwt=${loginData.data.token}&doc_id=${e.target.id}`)
 	}
 	const uploadFile = () => {
+		if (shareTo === undefined) {
+			alert('Please select a person to share with...')
+			return
+		}
+		if (docType === undefined) {
+			alert('Please select a document type.')
+			return
+		}
+		const doc_id = uuidv4()
 		const formData = new FormData()
-		formData.append('doc_type', 'identity') // appending file
+		formData.append('doc_id', doc_id)
+		formData.append('doc_type', docType.value) // appending file
+		formData.append('issued_to', shareTo.value)
+		formData.append('uuid', loginData.data.userId)
 		formData.append('file', file) // appending file
+
 		axios
 			.post('https://192.168.2.235/api/upload_document', formData, {
 				onUploadProgress: (ProgressEvent) => {
@@ -72,6 +91,7 @@ function Documents() {
 			})
 			.then((res) => {
 				console.log(res)
+				getMyDocuments()
 			})
 			.catch((err) => console.log(err))
 	}
@@ -79,28 +99,26 @@ function Documents() {
 	return (
 		<>
 			<div className="file-upload">
+				<h1 className="my-5" style={{color: 'var(--dark-green)'}}>
+					Upload file to share with someone
+				</h1>
 				<input type="file" onChange={handleFileChange} />
-				<div className="progessBar" style={{width: progress}}>
-					{progress < 100 ? progress + '%' : <p className="text-success">Upload Complete!</p>}
-				</div>
-				<button onClick={uploadFile} className="btn btn-primary">
+
+				<br />
+				<Select options={createSelectOptions()} value={shareTo} onChange={setShareTo} placeholder="Select your State" />
+				<br />
+				<Select options={doc_type_supported} value={docType} onChange={setDocType} placeholder="Select Document Type" />
+				<button onClick={uploadFile} className="btn btn-primary my-5">
 					Upload
 				</button>
-				<Select options={createSelectOptions()} placeholder="Select your State" />
 				<hr />
-
-				{progress === 100 && (
-					<a href={'https://192.168.2.235/docs/' + file.name} target="_blank">
-						{file.name} (View)
-					</a>
-				)}
 			</div>
 
-			<h3 style={{color: 'var(--dark-green)'}}>Docs Management</h3>
+			<h1 style={{color: 'var(--dark-green)'}}>Docs Management</h1>
 			<br></br>
 			<br></br>
 			<br></br>
-			<h1>My Documents</h1>
+			<h2>My Documents</h2>
 			<div className={`${myDocuments.length > 0 ? 'col-10 p-0 ml-5 text-left' : ''} `}>
 				{myDocuments.length > 0 ? (
 					<table className="table table-borderless ml-3" style={{minWidth: '130%'}}>
