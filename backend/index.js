@@ -191,14 +191,15 @@ app.post('/api/upload_identity', function (req, res) {
 	upload(req, res, (err) => {
 		if (err) {
 			console.log('Error Occurs', err)
-			res.status(400).send('Something went wrong!')
+			res.send('Something went wrong!')
 		} else if (req.file === undefined || req.body.uuid === undefined || req.body.doc_type === undefined || req.body.issued_to === undefined || req.body.doc_id === undefined) {
 			console.log('missing parameters')
 			deleteUser(req.body.uuid)
 			res.send('missing parameters')
+		} else {
+			console.log('File Uploaded')
+			res.send(req.file)
 		}
-		console.log('File Uploaded')
-		res.send(req.file)
 	})
 })
 
@@ -207,10 +208,14 @@ app.post('/api/upload_document', function (req, res) {
 	upload(req, res, (err) => {
 		if (err) {
 			console.log('Error Occurs', err)
-			res.status(400).send('Something went wrong!')
+			res.send('Something went wrong!')
+		} else if (req.file === undefined || req.body.uuid === undefined || req.body.doc_type === undefined || req.body.issued_to === undefined || req.body.doc_id === undefined) {
+			console.log('missing parameters')
+			res.send('missing parameters')
+		} else {
+			console.log('File Uploaded')
+			res.send(req.file)
 		}
-		console.log('File Uploaded')
-		res.send(req.file)
 	})
 })
 
@@ -867,8 +872,8 @@ app.get('/api/updateClaimStatus', (req, res) => {
 	} else res.send('Not authorized to update claim status.')
 })
 
-app.get('/api/filterpatientadmin', (req, res) => {
-	// const value = req.query.id
+app.get('/api/sharing', (req, res) => {
+	console.log('API: /api/sharing')
 	if (req.query.jwt === undefined) {
 		res.json({status: 'missing parameters'})
 	}
@@ -880,9 +885,49 @@ app.get('/api/filterpatientadmin', (req, res) => {
 		return
 	}
 	if (roles.includes(decoded_token.role)) {
-		con.query(`SELECT * FROM users WHERE (role = 'doctor' AND status = 1) OR (role = 'pharmacy' AND status = 1) OR (role = 'hospital' AND status = 1) OR (role = 'insurance' AND status = 1)`, (err, data) => {
+		con.query(`SELECT * FROM users WHERE status=1 AND role<>"${decoded_token.role}" AND role<>'admin'`, (err, data) => {
 			if (err) throw err
 			res.json({data})
+		})
+	}
+})
+
+app.get('/api/myDocuements', (req, res) => {
+	console.log('API: /api/myDocuments')
+	if (req.query.jwt === undefined) {
+		res.json({status: 'missing parameters'})
+	}
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (roles.includes(decoded_token.role)) {
+		con.query(`SELECT id, issued_to, doc_type, path FROM dcuments WHERE issued_by=${decoded_token.id}`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
+app.get('/api/deleteDoc', (req, res) => {
+	console.log('API: /api/deleteDoc')
+	if (req.query.jwt === undefined || req.query.doc_id === undefined) {
+		res.json({status: 'missing parameters'})
+	}
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (roles.includes(decoded_token.role) && decoded_token.id === req.query.issued_by) {
+		con.query(`DELETE FROM documents WHERE issued_by=${decoded_token.id}`, (err, data) => {
+			if (err) throw err
+			res.json({message: 'delete successfully'})
 		})
 	}
 })
