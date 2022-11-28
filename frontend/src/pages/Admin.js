@@ -84,6 +84,9 @@ function Admin() {
 									<td className="pl-0">{user.city}</td>
 									<td className="pl-0">{user.state}</td>
 									<td className="pl-0">{user.phone}</td>
+									<td>
+										<a href={`https://192.168.2.235/docs/${user.path}`}>File</a>
+									</td>
 									<div>
 										<button className="btn btn-primary mx-2" onClick={updateUserStatus} id={user.id} value="1">
 											Approve
@@ -148,6 +151,9 @@ function Admin() {
 									<td className="pl-0">{user.city}</td>
 									<td className="pl-0">{user.state}</td>
 									<td className="pl-0">{user.phone}</td>
+									<td>
+										<a href={`https://192.168.2.235/docs/${user.path}`}>File</a>
+									</td>
 									<div>
 										<button className="btn btn-primary mx-2" onClick={updateUserStatus} id={user.id} value="1">
 											Approve
@@ -207,7 +213,7 @@ function Admin() {
 									<td className="pl-0">{user.state}</td>
 									<td className="pl-0">{user.phone}</td>
 									<td>
-										<a href={user.path}>File</a>
+										<a href={`https://192.168.2.235/docs/${user.path}`}>File</a>
 									</td>
 									<div>
 										<button className="btn btn-outline-secondary mx-2" onClick={updateUserStatus} id={user.id} value="0">

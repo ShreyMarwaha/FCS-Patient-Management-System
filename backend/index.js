@@ -64,20 +64,31 @@ const port = process.env.PORT || 5000
 app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) : console.log('Listening for Port ', port)))
 
 // Util Functions /////////////////////////////////////////////////
+function addDocumentDetails(doc_id, issued_by, issued_to, doc_type, path) {
+	console.log('FUNC: addDocumentDetails', doc_id)
+	if (validateParameters([doc_id, issued_by, issued_to, doc_type, path])) {
+		console.log('valid params')
+		con.query(`INSERT INTO documents (id, issued_by, issued_to, doc_type, path) VALUES ("${doc_id}", "${issued_by}", "${issued_to}", "${doc_type}", "${path}")`, (err, data) => {
+			if (err) throw err
+		})
+	} else console.log('missing params')
+}
+
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		console.log('choosing destination', req.body.doc_type, req.body.)
+		console.log('FUNC: storage')
 		if (!file.originalname.match(/\.(pdf|jpg|jpeg)$/)) {
 			console.log('Not a supported file extension')
 			deleteUser(req.body.uuid)
 			return cb(new Error('Not a supported file extension'))
-		} else if (doc_type_supported.includes(req.body.doc_type) && validateParameters([req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, req.body.uuid, req.body.doc_id])) {
+		} else if (doc_type_supported.includes(req.body.doc_type) && validateParameters([req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, req.body.uuid])) {
 			const path = `${base_dir}/${req.body.uuid}`
 			console.log('Path: ', path)
 			addDocumentDetails(req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, req.body.uuid + '/' + req.body.doc_id + '.' + file.originalname.split('.').pop())
 			cb(null, path)
 		} else {
 			console.log('Missing paramerer while storing file')
+			console.log('PARAMS:', req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type)
 			deleteUser(req.body.uuid)
 			return cb(new Error('Invalid Document Type'))
 		}
@@ -162,14 +173,6 @@ function makeUserDirectoryStructure(uuid) {
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, {recursive: true})
 	}
-}
-
-function addDocumentDetails(doc_id, issued_by, issued_to, doc_type, path) {
-	// generate uuid of document
-	console.log('FUNC: addDocumentDetails', doc_id)
-	con.query(`INSERT INTO documents (id, issued_by, issued_to, doc_type, path) VALUES ("${doc_id}", "${issued_by}", "${issued_to}", "${doc_type}", "${path}")`, (err, data) => {
-		if (err) throw err
-	})
 }
 
 // API Definitions /////////////////////////////////////////////////
@@ -862,4 +865,24 @@ app.get('/api/updateClaimStatus', (req, res) => {
 			})
 		}
 	} else res.send('Not authorized to update claim status.')
+})
+
+app.get('/api/filterpatientadmin', (req, res) => {
+	// const value = req.query.id
+	if (req.query.jwt === undefined) {
+		res.json({status: 'missing parameters'})
+	}
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (roles.includes(decoded_token.role)) {
+		con.query(`SELECT * FROM users WHERE (role = 'doctor' AND status = 1) OR (role = 'pharmacy' AND status = 1) OR (role = 'hospital' AND status = 1) OR (role = 'insurance' AND status = 1)`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
 })
