@@ -154,8 +154,8 @@ function SignUp() {
 							<option value="patient">Patient</option>
 							<option value="doctor">Doctor</option>
 							<option value="hospital">Hospital</option>
-							<option value="hospital">Pharmacy</option>
-							<option value="hospital">Insurance</option>
+							<option value="pharmacy">Pharmacy</option>
+							<option value="insurance">Insurance</option>
 						</Form.Select>
 					</Form.Group>
 					<Form.Group controlId="form_identity_proof" className="my-4">
