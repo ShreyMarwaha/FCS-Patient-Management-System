@@ -59,9 +59,7 @@ function App() {
 									User Management
 								</Link>
 							</div>
-						) : 
-						loginData.data.role === 'doctor' ? 
-						(
+						) : loginData.data.role === 'doctor' ? (
 							<div className="sidebar">
 								<Link className="sidebar-btn" to={'/Patient'}>
 									View Patients
@@ -75,16 +73,13 @@ function App() {
 									View Wallet
 								</Link>
 							</div>
-						) :
-						loginData.data.role === 'insurance' ? 
-						(
+						) : loginData.data.role === 'insurance' ? (
 							<div className="sidebar">
 								<Link className="sidebar-btn" to={'/Insurance'}>
 									View Claims
 								</Link>
 							</div>
-						) :
-						(
+						) : (
 							<div className="sidebar">
 								<Link className="sidebar-btn" to={'/search'}>
 									Search
@@ -127,7 +122,7 @@ function App() {
 										<Route path="/Patient" element={<Patient />} />
 										<Route path="/Prescription" element={<Prescription />} />
 										<Route path="/Wallet" element={<Wallet />} />
-										<Route path="/Insurance" element={<Insurance/>} />
+										<Route path="/Insurance" element={<Insurance />} />
 									</>
 								) : (
 									<>

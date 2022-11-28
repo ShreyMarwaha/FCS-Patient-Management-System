@@ -149,7 +149,7 @@ function deleteUser(uuid) {
 	})
 }
 
-function deleteClaim(uuid){
+function deleteClaim(uuid) {
 	console.log('FUNC: deleteClaim', uuid)
 	con.query(`DELETE FROM claims WHERE id="${uuid}"`, (err, data) => {
 		if (err) throw err
@@ -849,7 +849,7 @@ app.get('/api/updateClaimStatus', (req, res) => {
 				// 		if (err) throw err
 				// 		res.send('User approved & User Wallet Created')
 				// 	})
-				// } else 
+				// } else
 				res.send('Updated status of Claim ' + id + ' to ' + status)
 			})
 		}
