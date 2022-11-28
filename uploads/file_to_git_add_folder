@@ -1,0 +1,28 @@
+All uploads will come under dir uploads/
+
+Folder structuure of uploads/ will be...
+
+user_id_1
+|----identity
+|	|--- proof
+|
+|----prescriptions
+|	|--- presc 1
+|	|--- presc 2
+|
+|----medical bills
+	|--- bill 1
+	|--- bill 2
+
+
+
+
+user_id_2
+|----identity
+|	|--- proof
+|
+|----prescriptions
+|	|--- presc 1
+|
+|----medical bills
+	|--- bill 1
