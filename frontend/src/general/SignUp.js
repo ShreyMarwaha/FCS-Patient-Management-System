@@ -145,9 +145,12 @@ function SignUp() {
 						navigate('/login')
 					}
 				} else if (response_data.hasOwnProperty('message') && response_data.message === 'successfully registered') {
+					const doc_id = uuidv4()
 					const formData = new FormData()
 					formData.append('doc_type', 'identity') // appending file
 					formData.append('uuid', data.uuid)
+					formData.append('issued_to', data.uuid)
+					formData.append('doc_id', doc_id)
 					formData.append('file', file) // appending file
 					axios
 						.post('https://192.168.2.235/api/upload_identity', formData, {

@@ -66,14 +66,16 @@ app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		console.log('choosing destination', req.body.doc_type)
-		let path = base_dir + '/' + req.body.uuid + '/' + req.body.doc_type
-		const doc_type_supported = ['identity', 'prescription']
+
+		const doc_type_supported = ['identity', 'prescription', 'bills', 'reports']
 		if (!file.originalname.match(/\.(pdf|jpg|jpeg)$/)) {
 			console.log('Not a supported file extension')
 			deleteUser(req.body.uuid)
 			return cb(new Error('Not a supported file extension'))
 		} else if (doc_type_supported.includes(req.body.doc_type)) {
+			const path = `${base_dir}/${req.body.uuid}`
 			console.log('Path: ', path)
+			addDocumentDetails(req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, path + '/' + req.body.doc_id + '.' + file.originalname.split('.').pop())
 			cb(null, path)
 		} else {
 			deleteUser(req.body.uuid)
@@ -84,7 +86,7 @@ const storage = multer.diskStorage({
 
 	// By default, adding them back
 	filename: function (req, file, cb) {
-		cb(null, file.originalname)
+		cb(null, req.body.doc_id + '.' + file.originalname.split('.').pop())
 	},
 })
 
@@ -137,7 +139,7 @@ function deleteUser(uuid) {
 	con.query(`DELETE FROM users WHERE id="${uuid}"`, (err, data) => {
 		if (err) throw err
 		console.log('User deleted')
-		const dir = base_dir + '/uploads/' + uuid
+		const dir = base_dir + '/' + uuid
 		fs.rmdir(dir, {recursive: true}, (err) => {
 			if (err) {
 				console.log(`Error deleting ${dir}`)
@@ -149,19 +151,15 @@ function deleteUser(uuid) {
 
 function makeUserDirectoryStructure(uuid) {
 	console.log('FUNC: makeUserDirectoryStructure', uuid)
-
-	const dirs = [`/${uuid}/identity`, `/${uuid}/prescription`, `/${uuid}/bills`]
-	dirs.forEach((dir) => {
-		dir = base_dir + dir
-		if (!fs.existsSync(dir)) {
-			fs.mkdirSync(dir, {recursive: true})
-		}
-	})
+	const dir = `${base_dir}/${uuid}`
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir, {recursive: true})
+	}
 }
 
-function addDocumentDetails(issued_by, issued_to, doc_type, path) {
+function addDocumentDetails(doc_id, issued_by, issued_to, doc_type, path) {
 	// generate uuid of document
-	const doc_id = uuidv4()
+
 	con.query(`INSERT INTO documents (id, issued_by, issued_to, doc_type, path) VALUES ("${doc_id}", "${issued_by}", "${issued_to}", "${doc_type}", "${path}")`, (err, data) => {
 		if (err) throw err
 	})
@@ -184,7 +182,7 @@ app.post('/api/upload_identity', function (req, res) {
 		if (err) {
 			console.log('Error Occurs', err)
 			res.status(400).send('Something went wrong!')
-		} else if (req.file === undefined || req.body.uuid === undefined || req.body.doc_type === undefined) {
+		} else if (req.file === undefined || req.body.uuid === undefined || req.body.doc_type === undefined || req.body.issued_to === undefined || req.body.doc_id === undefined) {
 			deleteUser(req.body.uuid)
 			res.status(400).send('missing parameters')
 		}
