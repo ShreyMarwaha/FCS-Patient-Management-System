@@ -11,6 +11,7 @@ const otpGenerator = require('otp-generator')
 const nodemailer = require('nodemailer')
 const rateLimit = require('express-rate-limit')
 const requestIp = require('request-ip')
+const {v4: uuidv4} = require('uuid')
 var fs = require('fs')
 require('dotenv').config()
 
@@ -52,8 +53,8 @@ const razorpay = new Razorpay({
 var transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
-		user: 'wbciiitd2021@gmail.com',
-		pass: 'tliyahfrnskdosty',
+		user: 'browniemailer01@gmail.com',
+		pass: 'omxdmgpjneaqsnyz',
 	},
 })
 
@@ -156,6 +157,15 @@ function makeUserDirectoryStructure(uuid) {
 		}
 	})
 }
+
+function addDocumentDetails(issued_by, issued_to, doc_type, path) {
+	// generate uuid of document
+	const doc_id = uuidv4()
+	con.query(`INSERT INTO documents (id, issued_by, issued_to, doc_type, path) VALUES ("${doc_id}", "${issued_by}", "${issued_to}", "${doc_type}", "${path}")`, (err, data) => {
+		if (err) throw err
+	})
+}
+
 // API Definitions /////////////////////////////////////////////////
 
 app.get('/api/test', (req, res) => {
@@ -549,7 +559,7 @@ app.post('/api/razorpay', async (req, res) => {
 	}
 })
 
-app.get('/api/normalusers', (req, res) => {
+app.get('/api/users', (req, res) => {
 	let decoded_token
 	try {
 		decoded_token = verify_jwt_signature(req.query.jwt)
@@ -557,38 +567,8 @@ app.get('/api/normalusers', (req, res) => {
 		res.json({err})
 		return
 	}
-	if (decoded_token.role == 'admin') {
-		con.query(`SELECT email, role, city, state, phone FROM users WHERE status = 1 AND role != "admin"`, (err, data) => {
-			if (err) throw err
-			res.json({data})
-		})
-	}
-})
-app.get('/api/blockedusers', (req, res) => {
-	let decoded_token
-	try {
-		decoded_token = verify_jwt_signature(req.query.jwt)
-	} catch (err) {
-		res.json({err})
-		return
-	}
-	if (decoded_token.role == 'admin') {
-		con.query(`SELECT email, role, city, state, phone FROM users WHERE status = 2`, (err, data) => {
-			if (err) throw err
-			res.json({data})
-		})
-	}
-})
-app.get('/api/unverifiedusers', (req, res) => {
-	let decoded_token
-	try {
-		decoded_token = verify_jwt_signature(req.query.jwt)
-	} catch (err) {
-		res.json({err})
-		return
-	}
-	if (decoded_token.role == 'admin') {
-		con.query('SELECT id, email, role, city, state, phone FROM users WHERE status = 0', (err, data) => {
+	if (decoded_token.role === 'admin') {
+		con.query('SELECT id, email, role, city, state, phone, status FROM users', (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -651,9 +631,10 @@ app.get('/api/searchmedicinebyid', (req, res) => {
 	}
 })
 
-app.get('/api/approveuser', (req, res) => {
+app.get('/api/updateUserStatus', (req, res) => {
 	const id = req.query.id
-	if (id === undefined) {
+	const status = req.query.status
+	if (id === undefined || status === undefined) {
 		res.json({status: 'missing parameters'})
 		return
 	}
@@ -664,13 +645,18 @@ app.get('/api/approveuser', (req, res) => {
 		res.json({err})
 		return
 	}
-	if (decoded_token.role == 'admin') {
-		const query = 'UPDATE users SET status = 1 WHERE id = ?'
-		con.query(query, [id], (err, data) => {
-			if (err) throw err
-			res.send('User Approved with id ' + id)
-		})
-	} else res.send('Not authorized to approve user.')
+	if (decoded_token.role === 'admin' && 0 <= status && status <= 3) {
+		if (status === 3) {
+			deleteUser(id)
+			res.send('Deleted user ' + id)
+		} else {
+			const query = 'UPDATE users SET status = ? WHERE id = ?'
+			con.query(query, [status, id], (err, data) => {
+				if (err) throw err
+				res.send('Updated status of user ' + id + ' to ' + status)
+			})
+		}
+	} else res.send('Not authorized to update user status.')
 })
 
 app.get('/api/searchpatientbyemail', (req, res) => {
