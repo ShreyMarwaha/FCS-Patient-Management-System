@@ -139,7 +139,7 @@ function SignUp() {
 						<Form.Control type="password" placeholder="Password" className="border border-success" />
 						<p id="password-strength"></p>
 						<div className="rounded shadow p-3 text-left font-weight-light" style={{width: '450px'}}>
-							<h5>Password must met following conditions:</h5>
+							<h5>Password must meet following conditions:</h5>
 							<p>Contain at least 8 characters</p>
 							<p>Contain at least one uppercase letter</p>
 							<p>Contain at least one lowercase letter</p>
@@ -155,6 +155,7 @@ function SignUp() {
 							<option value="doctor">Doctor</option>
 							<option value="hospital">Hospital</option>
 							<option value="hospital">Pharmacy</option>
+							<option value="hospital">Insurance</option>
 						</Form.Select>
 					</Form.Group>
 					<Form.Group controlId="form_identity_proof" className="my-4">
