@@ -15,11 +15,12 @@ function Admin() {
 	}, [])
 
 	function getUsers() {
-		fetch(`https://192.168.2.235/api/users?jwt=${loginData.data.token}`).then((res) => {
+		fetch(`https://192.168.2.235/api/usersWithIdentities?jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.hasOwnProperty('err') || data.data.length === 0) {
 					console.log('No users present !!')
 				} else {
+					console.log(data)
 					setUnverifiedUsers(data.data.filter((user) => user.status === 0))
 					setVerifiedUsers(data.data.filter((user) => user.status === 1))
 					setBlockedUsers(data.data.filter((user) => user.status === 2))
@@ -65,6 +66,9 @@ function Admin() {
 								</th>
 								<th className="text-secondary" scope="col">
 									Phone
+								</th>
+								<th className="text-secondary" scope="col">
+									Identity
 								</th>
 								<th className="text-secondary" scope="col">
 									Action
@@ -128,6 +132,9 @@ function Admin() {
 									Phone
 								</th>
 								<th className="text-secondary" scope="col">
+									Identity
+								</th>
+								<th className="text-secondary" scope="col">
 									Action
 								</th>
 							</tr>
@@ -183,6 +190,9 @@ function Admin() {
 									Phone
 								</th>
 								<th className="text-secondary" scope="col">
+									Identity
+								</th>
+								<th className="text-secondary" scope="col">
 									Action
 								</th>
 							</tr>
@@ -196,6 +206,9 @@ function Admin() {
 									<td className="pl-0">{user.city}</td>
 									<td className="pl-0">{user.state}</td>
 									<td className="pl-0">{user.phone}</td>
+									<td>
+										<a href={user.path}>File</a>
+									</td>
 									<div>
 										<button className="btn btn-outline-secondary mx-2" onClick={updateUserStatus} id={user.id} value="0">
 											Unverify

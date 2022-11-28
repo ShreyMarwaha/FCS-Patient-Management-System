@@ -46,6 +46,7 @@ con.on('error', function (err) {
 const JWT_SECRET = 'mq0g8!0f^DsHYjlq1G^nX0it&E384isrWOiTY05q&M!#RPSrM!'
 const base_dir = '/var/www/uploads'
 const roles = ['admin', 'patient', 'doctor', 'pharmacy', 'insurance', 'hospital']
+const doc_type_supported = ['identity', 'prescription', 'bills', 'reports']
 const razorpay = new Razorpay({
 	key_id: 'rzp_test_lzmoFzw17LDqLa',
 	key_secret: '6GBr3MchuCrHvUoOwOT5NMfq',
@@ -65,21 +66,19 @@ app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) 
 // Util Functions /////////////////////////////////////////////////
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		console.log('choosing destination', req.body.doc_type)
-
-		const doc_type_supported = ['identity', 'prescription', 'bills', 'reports']
+		console.log('choosing destination', req.body.doc_type, req.body.)
 		if (!file.originalname.match(/\.(pdf|jpg|jpeg)$/)) {
 			console.log('Not a supported file extension')
 			deleteUser(req.body.uuid)
 			return cb(new Error('Not a supported file extension'))
-		} else if (doc_type_supported.includes(req.body.doc_type)) {
+		} else if (doc_type_supported.includes(req.body.doc_type) && validateParameters([req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, req.body.uuid, req.body.doc_id])) {
 			const path = `${base_dir}/${req.body.uuid}`
 			console.log('Path: ', path)
 			addDocumentDetails(req.body.doc_id, req.body.uuid, req.body.issued_to, req.body.doc_type, req.body.uuid + '/' + req.body.doc_id + '.' + file.originalname.split('.').pop())
 			cb(null, path)
 		} else {
+			console.log('Missing paramerer while storing file')
 			deleteUser(req.body.uuid)
-			console.log('invalid doc_type')
 			return cb(new Error('Invalid Document Type'))
 		}
 	},
@@ -167,7 +166,7 @@ function makeUserDirectoryStructure(uuid) {
 
 function addDocumentDetails(doc_id, issued_by, issued_to, doc_type, path) {
 	// generate uuid of document
-
+	console.log('FUNC: addDocumentDetails', doc_id)
 	con.query(`INSERT INTO documents (id, issued_by, issued_to, doc_type, path) VALUES ("${doc_id}", "${issued_by}", "${issued_to}", "${doc_type}", "${path}")`, (err, data) => {
 		if (err) throw err
 	})
@@ -191,8 +190,9 @@ app.post('/api/upload_identity', function (req, res) {
 			console.log('Error Occurs', err)
 			res.status(400).send('Something went wrong!')
 		} else if (req.file === undefined || req.body.uuid === undefined || req.body.doc_type === undefined || req.body.issued_to === undefined || req.body.doc_id === undefined) {
+			console.log('missing parameters')
 			deleteUser(req.body.uuid)
-			res.status(400).send('missing parameters')
+			res.send('missing parameters')
 		}
 		console.log('File Uploaded')
 		res.send(req.file)
@@ -586,6 +586,22 @@ app.get('/api/users', (req, res) => {
 	}
 })
 
+app.get('/api/usersWithIdentities', (req, res) => {
+	let decoded_token
+	try {
+		decoded_token = verify_jwt_signature(req.query.jwt)
+	} catch (err) {
+		res.json({err})
+		return
+	}
+	if (decoded_token.role === 'admin') {
+		con.query(`SELECT users.id, users.email, users.role, users.city, users.state, users.phone, users.status, documents.path from users LEFT JOIN documents ON users.id=documents.issued_by WHERE documents.doc_type='identity'`, (err, data) => {
+			if (err) throw err
+			res.json({data})
+		})
+	}
+})
+
 app.get('/api/viewpatients', (req, res) => {
 	let decoded_token
 	try {
@@ -812,9 +828,8 @@ app.get('/api/viewclaims', (req, res) => {
 		res.json({err})
 		return
 	}
-	const query = 'SELECT * FROM claims WHERE insurance_company_id LIKE ?'
 	if (decoded_token.role == 'insurance') {
-		con.query(query, [value], (err, data) => {
+		con.query(`SELECT * FROM claims WHERE insurance_company_id = ${value}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -840,16 +855,9 @@ app.get('/api/updateClaimStatus', (req, res) => {
 			deleteClaim(id)
 			res.send('Deleted Claim ' + id)
 		} else {
-			const query = 'UPDATE claims SET status = ? WHERE id = ?'
-			con.query(query, [status, id], (err, data) => {
+			// const query = 'UPDATE claims SET status = ? WHERE id = ?'
+			con.query(`UPDATE claims SET status = ${status} WHERE id LIKE "%${id}"%`, (err, data) => {
 				if (err) throw err
-				// if (status === 1) {
-				// 	const walletquery = 'INSERT INTO wallet (userid, balance) VALUES (?, 0)'
-				// 	con.query(walletquery, [id], (err, data) => {
-				// 		if (err) throw err
-				// 		res.send('User approved & User Wallet Created')
-				// 	})
-				// } else
 				res.send('Updated status of Claim ' + id + ' to ' + status)
 			})
 		}
