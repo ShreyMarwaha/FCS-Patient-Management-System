@@ -19,7 +19,7 @@ function Insurance() {
 	function getUsers() {
         const id = loginData.data.userId
 		
-		fetch(`https://192.168.2.235/api/viewclaims?id="${id}"&jwt=${loginData.data.token}`).then((res) => {
+		fetch(`https://192.168.2.235/api/viewclaims?id=${id}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.hasOwnProperty('err') || data.data.length === 0) {
 					alert('No Claims present !!')
@@ -38,7 +38,7 @@ function Insurance() {
 		const status = e.target.value
 
 		if (window.confirm('Are you sure you want to update the claim status?')) {
-			fetch(`https://192.168.2.235/api/updateClaimStatus?status=${status}&id="${userID}"&jwt=${loginData.data.token}`).then((res) => {})
+			fetch(`https://192.168.2.235/api/updateClaimStatus?status=${status}&id=${userID}&jwt=${loginData.data.token}`).then((res) => {})
 			getUsers()
 		}
 	}

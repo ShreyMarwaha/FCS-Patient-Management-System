@@ -36,7 +36,7 @@ function Wallet() {
         data.name = loginData.data.name
         data.balance = 0                    // set the value to be the one added to the balance
 
-        fetch(`https://192.168.2.235/api/fetchbalance?id="${id}"&jwt=${loginData.data.token}`).then((res) => {
+        fetch(`https://192.168.2.235/api/fetchbalance?id=${id}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length===0) {
                     alert("User Wallet Not Found !!")

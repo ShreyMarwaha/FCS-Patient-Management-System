@@ -49,7 +49,7 @@ function Admin() {
 		var timestamp = Date.now()
 		// var date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(timestamp)	
 
-		fetch(`https://192.168.2.235/api/searchpatientbyemail?name="${email}"&jwt=${loginData.data.token}`).then((res) => {
+		fetch(`https://192.168.2.235/api/searchpatientbyemail?name=${email}&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.data.length===0) {
                     alert("Patient not found")
