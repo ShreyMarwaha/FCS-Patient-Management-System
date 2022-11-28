@@ -809,9 +809,8 @@ app.get('/api/viewclaims', (req, res) => {
 		res.json({err})
 		return
 	}
-	const query = 'SELECT * FROM claims WHERE insurance_company_id LIKE ?'
 	if (decoded_token.role == 'insurance') {
-		con.query(query, [value], (err, data) => {
+		con.query(`SELECT * FROM claims WHERE insurance_company_id = ${value}`, (err, data) => {
 			if (err) throw err
 			res.json({data})
 		})
@@ -837,16 +836,9 @@ app.get('/api/updateClaimStatus', (req, res) => {
 			deleteClaim(id)
 			res.send('Deleted Claim ' + id)
 		} else {
-			const query = 'UPDATE claims SET status = ? WHERE id = ?'
-			con.query(query, [status, id], (err, data) => {
+			// const query = 'UPDATE claims SET status = ? WHERE id = ?'
+			con.query(`UPDATE claims SET status = ${status} WHERE id = ${id}`, (err, data) => {
 				if (err) throw err
-				// if (status === 1) {
-				// 	const walletquery = 'INSERT INTO wallet (userid, balance) VALUES (?, 0)'
-				// 	con.query(walletquery, [id], (err, data) => {
-				// 		if (err) throw err
-				// 		res.send('User approved & User Wallet Created')
-				// 	})
-				// } else 
 				res.send('Updated status of Claim ' + id + ' to ' + status)
 			})
 		}

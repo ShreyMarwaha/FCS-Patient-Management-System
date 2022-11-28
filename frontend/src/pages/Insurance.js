@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom'
 import '../components/components.css'
 import React, {Component} from 'react'
 import {DataContext} from '../App'
+import {v4 as uuidv4} from 'uuid'
 
 function Insurance() {
 	const {loginData, setLoginData} = useContext(DataContext)
@@ -16,11 +17,12 @@ function Insurance() {
 	}, [])
 
 	function getUsers() {
-        const id = loginData.data.id
+        const id = loginData.data.userId
+		
 		fetch(`https://192.168.2.235/api/viewclaims?id="${id}"&jwt=${loginData.data.token}`).then((res) => {
 			res.json().then((data) => {
 				if (data.hasOwnProperty('err') || data.data.length === 0) {
-					console.log('No Claims present !!')
+					alert('No Claims present !!')
 				} else {
 					setUnverifiedUsers(data.data.filter((user) => user.status === 0))
 					setVerifiedUsers(data.data.filter((user) => user.status === 1))
@@ -36,7 +38,7 @@ function Insurance() {
 		const status = e.target.value
 
 		if (window.confirm('Are you sure you want to update the claim status?')) {
-			fetch(`https://192.168.2.235/api/updateClaimStatus?status=${status}&id=${userID}&jwt=${loginData.data.token}`).then((res) => {})
+			fetch(`https://192.168.2.235/api/updateClaimStatus?status=${status}&id="${userID}"&jwt=${loginData.data.token}`).then((res) => {})
 			getUsers()
 		}
 	}
@@ -78,7 +80,7 @@ function Insurance() {
 											Reject Claim
 										</button>
 										<button className="btn btn-outline-dark mx-2" onClick={updateClaimStatus} id={user.id} value="3">
-											Delete Delete
+											Delete Claim
 										</button>
 									</div>
 								</tr>

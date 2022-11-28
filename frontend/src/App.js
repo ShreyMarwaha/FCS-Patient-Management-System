@@ -59,53 +59,61 @@ function App() {
 									User Management
 								</Link>
 							</div>
-						) : 
-						loginData.data.role === 'doctor' ? 
+						) 
+						: 
 						(
-							<div className="sidebar">
-								<Link className="sidebar-btn" to={'/Patient'}>
-									View Patients
-								</Link>
-
-								<Link className="sidebar-btn" to={'/Prescription'}>
-									Make Prescription
-								</Link>
-
-								<Link className="sidebar-btn" to={'/Wallet'}>
-									View Wallet
-								</Link>
-							</div>
-						) :
-						loginData.data.role === 'insurance' ? 
-						(
-							<div className="sidebar">
-								<Link className="sidebar-btn" to={'/Insurance'}>
-									View Claims
-								</Link>
-							</div>
-						) :
-						(
-							<div className="sidebar">
-								<Link className="sidebar-btn" to={'/search'}>
-									Search
-								</Link>
-
-								<Link className="sidebar-btn" to={'/Meds'}>
-									Buy Medicines
-								</Link>
-
-								<Link className="sidebar-btn" to={'/Wallet'}>
-									View Wallet
-								</Link>
-
-								{loginData.data.role === 'patient' ? (
-									<Link className="sidebar-btn" to={'/Documents'}>
-										My Documents
+							loginData.data.role === 'doctor' ? 
+							(
+								<div className="sidebar">
+									<Link className="sidebar-btn" to={'/Patient'}>
+										View Patients
 									</Link>
-								) : (
-									<></>
-								)}
-							</div>
+
+									<Link className="sidebar-btn" to={'/Prescription'}>
+										Make Prescription
+									</Link>
+
+									<Link className="sidebar-btn" to={'/Wallet'}>
+										View Wallet
+									</Link>
+								</div>
+							) 
+							:
+							(
+								loginData.data.role === 'insurance' ? 
+								(
+									<div className="sidebar">
+										<Link className="sidebar-btn" to={'/Insurance'}>
+											View Claims
+										</Link>
+									</div>
+								) 
+								:
+								
+								(
+									<div className="sidebar">
+										<Link className="sidebar-btn" to={'/search'}>
+											Search
+										</Link>
+
+										<Link className="sidebar-btn" to={'/Meds'}>
+											Buy Medicines
+										</Link>
+
+										<Link className="sidebar-btn" to={'/Wallet'}>
+											View Wallet
+										</Link>
+
+										{loginData.data.role === 'patient' ? (
+											<Link className="sidebar-btn" to={'/Documents'}>
+												My Documents
+											</Link>
+										) : (
+											<></>
+										)}
+									</div>
+								)
+							)
 						)
 					) : (
 						<></>
