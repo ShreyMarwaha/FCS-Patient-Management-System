@@ -5,12 +5,24 @@ import Form from 'react-bootstrap/Form'
 import {Button} from 'react-bootstrap'
 import {DataContext} from '../App'
 import {useNavigate} from 'react-router-dom'
+import axios from 'axios'
 
 function SignUp() {
 	const {loggedIn, setLoggedIn} = useContext(DataContext)
-
 	const navigate = useNavigate()
+	const [file, setFile] = useState(undefined) // storing the uploaded file
+	// storing the recived file from backend
+	const [progress, setProgess] = useState(0) // progess bar
+	const handleFileChange = (e) => {
+		const file = e.target.files[0] // accessing file
+		console.log(file)
+		setProgess(0)
+		setFile(file) // storing file
+	}
 
+	function getExtension(filename) {
+		return filename.split('.').pop()
+	}
 	function handleSubmit(event) {
 		event.preventDefault()
 
@@ -23,6 +35,15 @@ function SignUp() {
 		if (!ValidateEmail(event.target.form_email.value) || !ValidateName(event.target.form_name.value) || CheckPasswordStrength(data.password) !== 'strong') {
 			return
 		}
+		if (file === undefined) {
+			alert('Please upload a pdf file')
+			return
+		}
+		if (getExtension(file.name) !== 'pdf' || getExtension(file.name) !== 'jpg' || getExtension(file.name) !== 'jpeg') {
+			alert('Only pdf/jpg/jpeg files are allowed')
+			return
+		}
+
 		data.uuid = uuidv4()
 		fetch('https://192.168.2.235/api/signup', {
 			method: 'POST',
@@ -32,13 +53,30 @@ function SignUp() {
 			body: JSON.stringify(data),
 		})
 			.then((response) => response.json())
-			.then((data) => {
-				if (data.hasOwnProperty('message') && data.message === 'user already exists') {
-					alert('Email already registered')
-					navigate('/login')
-				} else if (data.hasOwnProperty('message') && data.message === 'successfully registered') {
-					alert('Registration successful')
-					navigate('/login')
+			.then((response_data) => {
+				if (response_data.hasOwnProperty('message') && response_data.message === 'user already exists') {
+					if (window.confirm('Email already registered. Do you want to login?')) {
+						navigate('/login')
+					}
+				} else if (response_data.hasOwnProperty('message') && response_data.message === 'successfully registered') {
+					const formData = new FormData()
+					formData.append('doc_type', 'identity') // appending file
+					formData.append('uuid', data.uuid)
+					formData.append('file', file) // appending file
+					axios
+						.post('https://192.168.2.235/api/upload_identity', formData, {
+							onUploadProgress: (ProgressEvent) => {
+								let progress = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+								setProgess(progress)
+							},
+						})
+						.then((res) => {
+							alert('Successfully registered. Please login to continue.')
+						})
+						.catch((err) => {
+							console.log(err)
+							alert('Error uploading identity document. Please contact support.')
+						})
 				} else alert('Registration failed')
 			})
 			.catch((error) => {
@@ -84,7 +122,7 @@ function SignUp() {
 		}
 	}
 	return (
-		<Form onSubmit={handleSubmit} className="m-5 py-5">
+		<Form onSubmit={handleSubmit} style={{marginTop: '300px'}}>
 			<center className="form">
 				<div>
 					<h3 style={{color: 'var(--dark-green)'}}>Sign Up</h3>
@@ -97,7 +135,7 @@ function SignUp() {
 						<Form.Control type="email" placeholder="Enter email" />
 					</Form.Group>
 
-					<Form.Group className="mb-3" controlId="form_password">
+					<Form.Group className="mb-4" controlId="form_password">
 						<Form.Control type="password" placeholder="Password" className="border border-success" />
 						<p id="password-strength"></p>
 						<div className="rounded shadow p-3 text-left font-weight-light" style={{width: '450px'}}>
@@ -110,7 +148,7 @@ function SignUp() {
 						</div>
 					</Form.Group>
 
-					<Form.Group className="mb-3" controlId="form_registration_type">
+					<Form.Group className="my-4" controlId="form_registration_type">
 						<Form.Label>Register as...</Form.Label>
 						<Form.Select className="form-control" defaultValue="patient">
 							<option value="patient">Patient</option>
@@ -119,13 +157,16 @@ function SignUp() {
 							<option value="hospital">Pharmacy</option>
 						</Form.Select>
 					</Form.Group>
-					{/* <Form.Group controlId="formFile" className="mb-3">
-						<Form.Label>Default file input example</Form.Label>
-						<Form.Control type="file" />
-					</Form.Group> */}
+					<Form.Group controlId="form_identity_proof" className="my-4">
+						<Form.Label>
+							Please upload a proof of identity <br />
+							(Format: <b>pdf/jpg/jpeg</b>, Max Size: <b>1MB</b>)
+						</Form.Label>
+						<Form.Control type="file" onChange={handleFileChange} />
+					</Form.Group>
 				</div>
 				<div>
-					<Button variant="primary" type="submit" style={{marginBottom: 20, width: 100, backgroundColor: 'var(--dark-green)', border: 0}}>
+					<Button variant="primary" type="submit" style={{width: 100, backgroundColor: 'var(--dark-green)', border: 0}} className="my-4">
 						Submit
 					</Button>
 					<p>

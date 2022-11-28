@@ -1,5 +1,4 @@
 // Connection Setup ////////////////////////////////////////////////
-
 const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcrypt')
@@ -12,7 +11,7 @@ const otpGenerator = require('otp-generator')
 const nodemailer = require('nodemailer')
 const rateLimit = require('express-rate-limit')
 const requestIp = require('request-ip')
-
+var fs = require('fs')
 require('dotenv').config()
 
 const app = express()
@@ -44,7 +43,7 @@ con.on('error', function (err) {
 })
 
 const JWT_SECRET = 'mq0g8!0f^DsHYjlq1G^nX0it&E384isrWOiTY05q&M!#RPSrM!'
-
+const base_dir = '/var/www/FCS-Patient-Management-System'
 const razorpay = new Razorpay({
 	key_id: 'rzp_test_lzmoFzw17LDqLa',
 	key_secret: '6GBr3MchuCrHvUoOwOT5NMfq',
@@ -64,12 +63,26 @@ app.listen(port, (err) => (err ? console.log('Failed to Listen on Port ', port) 
 // Util Functions /////////////////////////////////////////////////
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, '/uploads/')
+		console.log('choosing destination', req.body.doc_type)
+		let path = '../uploads/' + req.body.uuid + '/' + req.body.doc_type
+		const doc_type_supported = ['identity', 'prescription']
+		if (!file.originalname.match(/\.(pdf|jpg|jpeg)$/)) {
+			console.log('Not a supported file extension')
+			deleteUser(req.body.uuid)
+			return cb(new Error('Not a supported file extension'))
+		} else if (doc_type_supported.includes(req.body.doc_type)) {
+			console.log('Path: ', path)
+			cb(null, path)
+		} else {
+			deleteUser(req.body.uuid)
+			console.log('invalid doc_type')
+			return cb(new Error('Invalid Document Type'))
+		}
 	},
 
 	// By default, adding them back
 	filename: function (req, file, cb) {
-		cb(null, Date.now() + '-' + file.originalname)
+		cb(null, file.originalname)
 	},
 })
 
@@ -105,7 +118,6 @@ function sendOTPviaMail(receiverEmail, otp) {
 		}
 	})
 }
-
 function generateOTP(id, user_email) {
 	const otp = otpGenerator.generate(8)
 	console.log(otp)
@@ -118,6 +130,31 @@ function generateOTP(id, user_email) {
 	sendOTPviaMail(user_email, otp)
 }
 
+function deleteUser(uuid) {
+	console.log('FUNC: deleteUser', uuid)
+	con.query(`DELETE FROM users WHERE id="${uuid}"`, (err, data) => {
+		if (err) throw err
+		console.log('User deleted')
+		const dir = base_dir + '/uploads/' + uuid
+		fs.rmdir(dir, {recursive: true}, (err) => {
+			if (err) {
+				console.log(`Error deleting ${dir}`)
+			}
+			console.log(`Deleted dir ${dir}`)
+		})
+	})
+}
+
+function makeUserDirectoryStructure(uuid) {
+	console.log('FUNC: makeUserDirectoryStructure', uuid)
+
+	const dirs = [`${base_dir}/uploads/${uuid}/identity`, `${base_dir}/uploads/${uuid}/prescription`]
+	dirs.forEach((dir) => {
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, {recursive: true})
+		}
+	})
+}
 // API Definitions /////////////////////////////////////////////////
 
 app.get('/api/test', (req, res) => {
@@ -129,14 +166,30 @@ app.get('/api/test', (req, res) => {
 	})
 })
 
-app.post('/api/upload_document', function (req, res) {
-	upload(req, res, function (err) {
-		if (err instanceof multer.MulterError) {
-			return res.status(500).json(err)
-		} else if (err) {
-			return res.status(500).json(err)
+app.post('/api/upload_identity', function (req, res) {
+	console.log('API: upload_identity')
+	upload(req, res, (err) => {
+		if (err) {
+			console.log('Error Occurs', err)
+			res.status(400).send('Something went wrong!')
+		} else if (req.file === undefined || req.body.uuid === undefined || req.body.doc_type === undefined) {
+			deleteUser(req.body.uuid)
+			res.status(400).send('missing parameters')
 		}
-		return res.status(200).send(req.file)
+		console.log('File Uploaded')
+		res.send(req.file)
+	})
+})
+
+app.post('/api/upload_document', function (req, res) {
+	console.log('API: upload_document')
+	upload(req, res, (err) => {
+		if (err) {
+			console.log('Error Occurs', err)
+			res.status(400).send('Something went wrong!')
+		}
+		console.log('File Uploaded')
+		res.send(req.file)
 	})
 })
 
@@ -326,13 +379,12 @@ app.get('/api/deletepha', (req, res) => {
 
 app.post('/api/signup', (req, res) => {
 	console.log('API: signup')
+	console.log(req.body)
 	const uuid = req.body.uuid
 	const name = req.body.name
 	const email = req.body.email
 	let password = req.body.password
 	const user_type = req.body.registration_type
-	console.log(req.body)
-
 	if (!validateParameters([uuid, name, email, password, user_type])) {
 		console.log('missing parameters')
 		res.json({status: 'missing parameters'})
@@ -346,12 +398,15 @@ app.post('/api/signup', (req, res) => {
 			if (user_type === 'doctor' || user_type === 'hospital' || user_type === 'pharmacy' || user_type === 'patient') {
 				con.query(`INSERT INTO users (id, name, email, role, password, salt) VALUES ('${uuid}','${name}', '${email}', '${user_type}', '${password}', '${salt}')`, (err) => {
 					if (err) throw err
+					makeUserDirectoryStructure(uuid)
 					res.json({message: 'successfully registered'})
 				})
 			} else {
+				console.log('invalid user type')
 				res.json({message: 'invalid user type'})
 			}
 		} else {
+			console.log('email already exists')
 			res.json({message: 'user already exists'})
 		}
 	})

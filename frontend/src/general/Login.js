@@ -97,6 +97,7 @@ function Login() {
 		setAuthenticateToLogin(false)
 		setError({isError: false, message: ''})
 	}
+
 	return (
 		<Form onSubmit={handleSubmit}>
 			<center className="form">
