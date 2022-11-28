@@ -162,6 +162,7 @@ function SignUp() {
 						})
 						.then((res) => {
 							alert('Successfully registered. Please login to continue.')
+							navigate('/login')
 						})
 						.catch((err) => {
 							console.log(err)
